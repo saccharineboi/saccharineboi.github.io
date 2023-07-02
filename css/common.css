@@ -1,0 +1,165 @@
+/* @author: saccharineboi */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+}
+
+body {
+    background: #121013;
+    color: #e3e3e4;
+    font-family: "Courier New", monospace;
+    font-size: 100%;
+}
+
+main {
+    width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #aeadad;
+    border-radius: 50px;
+}
+
+section {
+    padding: 20px;
+    margin: 20px;
+    border: 1px solid #aeadad;
+    border-radius: 10px;
+}
+
+.section-img {
+    width: 128px;
+    height: 128px;
+    float: left;
+}
+
+.section-btn:link, .section-btn:visited {
+    display: inline-block;
+    background: #59745b;
+    padding: 20px 80px;
+    margin-top: 30px;
+    border-radius: 10px;
+}
+
+.section-btn:hover, .section-btn:active {
+    background: #6f9578;
+}
+
+.qr-code {
+    width: 256px;
+    height: 256px;
+    margin: 20px 0px;
+    display: block;
+    margin: 20px auto;
+}
+
+#profile-photo {
+    width: 256px;
+    height: 256px;
+    border-radius: 50%;
+}
+
+header {
+    font-size: 2em;
+}
+
+@media screen and (max-width: 850px) {
+    main {
+        width: 600px;
+    }
+
+    .section-img {
+        float: none;
+        display: block;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    main {
+        width: 400px;
+    }
+
+    header {
+        font-size: 1.5em;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    main {
+        width: 320px;
+    }
+
+    header {
+        font-size: 1em;
+    }
+}
+
+summary {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+summary:hover {
+    cursor: pointer;
+    background: #aeadad;
+    color: rgb(0, 0, 0);
+}
+
+a {
+    color: whitesmoke;
+}
+
+figcaption {
+    font-style: italic;
+    padding: 20px;
+}
+
+.box {
+    overflow-wrap: break-word;
+}
+
+#blinking-cursor {
+    display: inline-block;
+    margin-left: 10px;
+    animation: blink 1.5s steps(2, start) infinite;
+    -webkit-animation: blink 1.5s steps(2, start) infinite;
+    font-size: 1em;
+}
+
+@keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+@-webkit-keyframes blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+.clearfix-hack::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.left-align {
+    text-align: left;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+}
+
+.onion {
+    display: block;
+    word-wrap: break-word;
+    padding: 10px;
+}
