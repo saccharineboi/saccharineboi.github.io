@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Hopper Demo | Hello Cube</title>
+    <link rel="stylesheet" href="../css/message.css">
+    <link rel="stylesheet" href="../css/debug.css">
+    <link rel="stylesheet" href="../css/loadscreen.css">
+    <link rel="stylesheet" href="../css/editor.css">
+    <link rel="stylesheet" href="../css/canvas.css">
+    <link rel="apple-touch-icon" sizes="57x57" href="../resources/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="../resources/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../resources/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="../resources/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../resources/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="../resources/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="../resources/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="../resources/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../resources/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="../resources/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../resources/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../resources/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../resources/favicon-16x16.png">
+    <link rel="manifest" href="../resources/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="../resources/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.29.0/ace.min.js" integrity="sha512-SIq2zE55rOM44SSvsEPcsDm4b3ZXP+4lChSfSHDgke4TtmaIFgiqrI1LhuLyQ5MQSIrD5vlJeC0ewakcP/zpXQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="playground-header"><strong>Hopper Playground v0.1.0</strong></div>
+    <iframe sandbox="allow-scripts allow-modals" id="frame-output"></iframe>
+    <div id="editor">// Draw a rotating cube
+import { Hopper } from "../js/renderer.build.js";
+
+try {
+    const hopper = Hopper({
+        canvasID: "render-output",
+        enableDebug: false,
+        debugRefreshDelay: 1000,
+        forceWebGL1: false,
+        antialias: true,
+        stencil: true,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: true
+    });
+
+    const Common = hopper.Common;
+    const Vec2 = hopper.Vec2;
+    const Vec3 = hopper.Vec3;
+    const Vec4 = hopper.Vec4;
+    const Quat = hopper.Quat;
+    const Transform = hopper.Transform;
+    const Mat4 = hopper.Mat4;
+
+    hopper.enableDepth();
+    hopper.enableCulling();
+
+    hopper.clearColor(Vec4(0.2, 0.3, 0.3, 1.0));
+
+    const prog = hopper.createBasicTextureProgram();
+    const cube = hopper.createCube(prog);
+
+    const texture2DLoader = hopper.createTexture2DLoader();
+    const texture = await texture2DLoader.loadCheckerboard({
+        brightColor: Vec4(200, 200, 200, 255),
+        darkColor: Vec4(50, 50, 50, 255),
+        minf: "nearest",
+        magf: "nearest",
+        wraps: "repeat",
+        wrapt: "repeat",
+        mipmap: false,
+        anisotropy: false
+    });
+
+    prog.use();
+
+    let rotY = 0;
+    hopper.render(dt => {
+        rotY += dt * 0.001;
+
+        hopper.resize();
+        hopper.clear();
+
+        const projection = Transform.perspective(Common.toRadians(90.0), hopper.getAspect(), 0.1, 100.0);
+        const view = Transform.lookAt(Vec3(0.0, 0.0, 2.0), Vec3(0.0, 0.0, 0.0), Vec3(0.0, 1.0, 0.0));
+        const model = Transform.fromRotationTranslationScale(Quat().setAxisAngle(Vec3(1, 1, 1).norm(), rotY), Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0));
+
+        prog.updateProjection(projection);
+        prog.updateModelView(view.mul(model));
+        prog.updateColor(Vec4((Math.cos(rotY) + 1.0) * 0.5, (Math.sin(rotY) + 1.0) * 0.5, 0.5, 1.0));
+        prog.updateTexTransform(Vec2(0.0, 0.0));
+        prog.updateTexMultiplier(Vec2(2.0, 2.0));
+
+        prog.setTexture(texture);
+
+        cube.bind();
+        cube.draw();
+    });
+}
+catch (e) {
+    const errorOutput = document.getElementById("error-output");
+    errorOutput.innerHTML = e.toString();
+    errorOutput.style.display = "block";
+}
+
+    </div>
+    <pre id="render-message"></pre>
+    <script type="module">
+        import { Hopper } from "../js/renderer.build.js";
+
+        const editor = ace.edit("editor", {
+            mode: "ace/mode/javascript",
+            selectionStyle: "text",
+            theme: "ace/theme/dracula",
+            fontSize: "12pt"
+        });
+
+        const frameOutput = document.getElementById("frame-output");
+
+        const runCode = () => {
+            const codeStr = `(async () => { ${editor.getValue() }})()`;
+            const frameSrc = `<!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                    }
+                    #render-output {
+                        background: black;
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    #error-output {
+                        position: absolute;
+                        background: black;
+                        color: white;
+                        font-size: 1.5em;
+                        margin: auto;
+                        padding: 10px;
+                        display: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <canvas id='render-output'></canvas>
+                <pre id='error-output'></pre>
+            </body>
+            <script type='module'>
+
+            ${editor.getValue()}
+
+            <\/script>
+            </html>`;
+
+            frameOutput.srcdoc = frameSrc;
+        };
+
+        runCode();
+
+        let alreadyRunning = false;
+        editor.session.on("change", delta => {
+            if (!alreadyRunning) {
+                alreadyRunning = true;
+                setTimeout(() => {
+                    runCode();
+                    alreadyRunning = false;
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
