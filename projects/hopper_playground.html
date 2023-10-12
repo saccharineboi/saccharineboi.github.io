@@ -31,14 +31,13 @@
 <body>
     <div class="playground-header"><strong>Hopper Playground v0.1.0</strong></div>
     <iframe sandbox="allow-scripts allow-modals" id="frame-output"></iframe>
-    <div id="editor">// Draw a rotating cube
-import { Hopper } from "../js/renderer.build.js";
+    <div id="editor">
+import {Hopper} from "../js/renderer.build.js";
 
 try {
     const hopper = Hopper({
         canvasID: "render-output",
         enableDebug: false,
-        debugRefreshDelay: 1000,
         forceWebGL1: false,
         antialias: true,
         stencil: true,
@@ -53,50 +52,81 @@ try {
     const Quat = hopper.Quat;
     const Transform = hopper.Transform;
     const Mat4 = hopper.Mat4;
+    const Mat3 = hopper.Mat3;
 
     hopper.enableDepth();
     hopper.enableCulling();
 
     hopper.clearColor(Vec4(0.2, 0.3, 0.3, 1.0));
 
-    const prog = hopper.createBasicTextureProgram();
-    const cube = hopper.createCube(prog);
+    const phongProgram = hopper.createPhongProgram();
+    const basicColorProgram = hopper.createBasicColorProgram();
 
-    const texture2DLoader = hopper.createTexture2DLoader();
-    const texture = await texture2DLoader.loadCheckerboard({
-        brightColor: Vec4(200, 200, 200, 255),
-        darkColor: Vec4(50, 50, 50, 255),
-        minf: "nearest",
-        magf: "nearest",
-        wraps: "repeat",
-        wrapt: "repeat",
-        mipmap: false,
-        anisotropy: false
-    });
+    const sphere = hopper.createUVSphere(phongProgram, 1.0, 20, 20);
+    const sphereWireframe = hopper.createUVSphere(basicColorProgram, 1.0, 20, 20);
 
-    prog.use();
+    hopper.bindPhongMaterialUBO();
+    hopper.setPhongMaterial({ ambient: Vec3(0.025, 0.05, 0.1),
+                              diffuse: Vec3(0.25, 0.5, 1.0),
+                              specular: Vec3(1.0, 1.0, 1.0),
+                              shininess: 16.0 });
+    hopper.unbindPhongMaterialUBO();
+
+    hopper.bindDirLightUBO();
+    hopper.setDirLight(0, { ambient: Vec3(1.0, 1.0, 1.0),
+                            diffuse: Vec3(1.0, 1.0, 1.0),
+                            specular: Vec3(1.0, 1.0, 1.0),
+                            direction: Vec3(0.0, 0.0, 0.0),
+                            intensity: 0.0 });
+    hopper.unbindDirLightUBO();
+
+    const rotation0 = Quat().setAxisAngle(Vec3(1.0, 0.0, 0.0), Math.PI / 2);
 
     let rotY = 0;
     hopper.render(dt => {
         rotY += dt * 0.001;
+
+        const { linear, quadratic } = Common.genAttenuationFromRange(100.0);
+
+        hopper.bindPointLightUBO();
+        hopper.setPointLight(0, { diffuse: Vec3(1.0, 1.0, 1.0),
+                                  specular: Vec3(1.0, 1.0, 1.0),
+                                  position: Vec3(5.0 * Math.cos(rotY), 0.0, 5.0 * Math.sin(rotY)),
+                                  constant: 1.0,
+                                  linear: linear,
+                                  quadratic: quadratic,
+                                  intensity: 1.0 });
+        hopper.unbindPointLightUBO();
+
+        const rotation1 = Quat().setAxisAngle(Vec3(0.0, 1.0, 0.0), rotY * 0.5);
 
         hopper.resize();
         hopper.clear();
 
         const projection = Transform.perspective(Common.toRadians(90.0), hopper.getAspect(), 0.1, 100.0);
         const view = Transform.lookAt(Vec3(0.0, 0.0, 2.0), Vec3(0.0, 0.0, 0.0), Vec3(0.0, 1.0, 0.0));
-        const model = Transform.fromRotationTranslationScale(Quat().setAxisAngle(Vec3(1, 1, 1).norm(), rotY), Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0));
+        const model = Transform.fromRotationTranslationScale(rotation1.mul(rotation0), Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0));
+        const normal = Transform.normalMat3FromMat4(view.mul(model));
 
-        prog.updateProjection(projection);
-        prog.updateModelView(view.mul(model));
-        prog.updateColor(Vec4((Math.cos(rotY) + 1.0) * 0.5, (Math.sin(rotY) + 1.0) * 0.5, 0.5, 1.0));
-        prog.updateTexTransform(Vec2(0.0, 0.0));
-        prog.updateTexMultiplier(Vec2(2.0, 2.0));
+        phongProgram.use();
 
-        prog.setTexture(texture);
+        phongProgram.updateProjection(projection);
+        phongProgram.updateModelView(view.mul(model));
+        phongProgram.updateNormal(normal);
 
-        cube.bind();
-        cube.draw();
+        sphere.bind();
+        sphere.draw();
+
+        basicColorProgram.use();
+
+        const model2 = Transform.fromRotationTranslationScale(rotation1.mul(rotation0), Vec3(0.0, 0.0, 0.0), Vec3(1.001, 1.001, 1.001));
+
+        basicColorProgram.updateProjection(projection);
+        basicColorProgram.updateModelView(view.mul(model2));
+        basicColorProgram.updateColor(Vec4(1.0, 1.0, 1.0, 1.0));
+
+        sphereWireframe.bind();
+        sphereWireframe.drawWireframe();
     });
 }
 catch (e) {
@@ -108,8 +138,6 @@ catch (e) {
     </div>
     <pre id="render-message"></pre>
     <script type="module">
-        import { Hopper } from "../js/renderer.build.js";
-
         const editor = ace.edit("editor", {
             mode: "ace/mode/javascript",
             selectionStyle: "text",
@@ -118,7 +146,6 @@ catch (e) {
         });
 
         const frameOutput = document.getElementById("frame-output");
-
         const runCode = () => {
             const codeStr = `(async () => { ${editor.getValue() }})()`;
             const frameSrc = `<!DOCTYPE html>
