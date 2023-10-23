@@ -121,6 +121,7 @@ figcaption {
 
 .box {
     overflow-wrap: break-word;
+    font-size: 0.9em;
 }
 
 #blinking-cursor {
