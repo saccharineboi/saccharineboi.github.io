@@ -23,7 +23,7 @@ html, body {
     font-size: 1em;
     padding: 10px;
     color: white;
-    background: rgb(20, 30, 30, 1.0);
+    background: #282a36;
 }
 
 #frame-output {
@@ -34,6 +34,7 @@ html, body {
     padding: 0;
     overflow: hidden;
     right: 0;
+    border: none;
 }
 
 @media (orientation: portrait) {
