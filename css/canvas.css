@@ -35,3 +35,11 @@ html, body {
     overflow: hidden;
     right: 0;
 }
+
+@media (orientation: portrait) {
+    #frame-output {
+        width: 100%;
+        height: 50%;
+        bottom: 0;
+    }
+}
