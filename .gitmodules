@@ -1,0 +1,3 @@
+[submodule "tp/Hopper"]
+	path = tp/Hopper
+	url = https://github.com/saccharineboi/Hopper
