@@ -30,8 +30,8 @@ section {
 }
 
 .section-img {
-    width: 128px;
-    height: 128px;
+    width: auto;
+    height: 160px;
     float: left;
 }
 
@@ -163,4 +163,8 @@ footer {
     display: block;
     word-wrap: break-word;
     padding: 10px;
+}
+
+.explanation {
+    padding-top: 20px;
 }
