@@ -144,6 +144,8 @@ try {
 
     const rotation0 = Quat().setAxisAngle(Vec3(1.0, 0.0, 0.0), -Math.PI / 2);
 
+    document.getElementById("loading-screen").style.display = "none";
+
     let rotY = 0;
     hopper.render(dt => {
         hopper.resize((width, height) => ppStack.resize(width, height));
@@ -251,10 +253,26 @@ catch (e) {
                         padding: 10px;
                         display: none;
                     }
+                    #loading-screen {
+                        position: absolute;
+                        background-image: url('../gif/loading.gif');
+                        background-color: black;
+                        background-position: center;
+                        background-size: 100px 100px;
+                        background-repeat: no-repeat;
+                        width: 100%;
+                        height: 100%;
+                        color: white;
+                        text-align: center;
+                        font-size: 1em;
+                        font-family: Verdana, sans-serif;
+                        padding-top: 10px;
+                    }
                 </style>
             </head>
             <body>
                 <canvas id='render-output'></canvas>
+                <div id="loading-screen">Hopper is loading. Please wait.</div>
                 <pre id='error-output'></pre>
             </body>
             <script type='module'>
