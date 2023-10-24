@@ -32,15 +32,16 @@
     <div class="playground-header"><strong>Hopper Playground v0.1.0</strong></div>
     <iframe sandbox="allow-scripts allow-modals" id="frame-output"></iframe>
     <div id="editor">
-import {Hopper} from "../js/renderer.build.js";
+import {Hopper} from "../tp/Hopper/build/renderer.build.js";
 
 try {
     const hopper = Hopper({
         canvasID: "render-output",
         enableDebug: false,
+        debugRefreshDelay: 1000,
         forceWebGL1: false,
-        antialias: true,
-        stencil: true,
+        antialias: false,
+        stencil: false,
         powerPreference: "high-performance",
         failIfMajorPerformanceCaveat: true
     });
@@ -54,16 +55,77 @@ try {
     const Mat4 = hopper.Mat4;
     const Mat3 = hopper.Mat3;
 
+    const ppStack = hopper.createPostProcessStack(hopper, 8);
+    const textureLoader = hopper.createTextureLoader();
+    const cubemapProgram = hopper.createCubemapProgram();
+    const cubemapTexture = await textureLoader.loadCubemap({
+            internalFormat: "rgb",
+            format: "rgb",
+            type: "uint8",
+        }, {
+            url: `../skyboxes/ulukai/corona_dn.png`,
+            face: "negative_y"
+        }, {
+            url: `../skyboxes/ulukai/corona_rt.png`,
+            face: "positive_x"
+        }, {
+            url: `../skyboxes/ulukai/corona_ft.png`,
+            face: "negative_z"
+        }, {
+            url: `../skyboxes/ulukai/corona_bk.png`,
+            face: "positive_z"
+        }, {
+            url: `../skyboxes/ulukai/corona_up.png`,
+            face: "positive_y"
+        }, {
+            url: `../skyboxes/ulukai/corona_lf.png`,
+            face: "negative_x"
+    });
+
+    const ambientTexture = await textureLoader.load2D("../earth_textures/8081_earthlights4k.jpg", {
+        internalFormat: "rgb",
+        format: "rgb",
+        type: "uint8",
+        minf: "linear_mipmap_linear",
+        magf: "linear",
+        wraps: "repeat",
+        wrapt: "repeat",
+        mipmap: true,
+        anisotropy: 16
+    });
+
+    const diffuseTexture = await textureLoader.load2D("../earth_textures/8081_earthmap4k.jpg", {
+        internalFormat: "rgb",
+        format: "rgb",
+        type: "uint8",
+        minf: "linear_mipmap_linear",
+        magf: "linear",
+        wraps: "repeat",
+        wrapt: "repeat",
+        mipmap: true,
+        anisotropy: 16
+    });
+
+    const specularTexture = await textureLoader.load2D("../earth_textures/8081_earthspec4k.jpg", {
+        internalFormat: "rgb",
+        format: "rgb",
+        type: "uint8",
+        minf: "linear_mipmap_linear",
+        magf: "linear",
+        wraps: "repeat",
+        wrapt: "repeat",
+        mipmap: true,
+        anisotropy: 16
+    });
+
     hopper.enableDepth();
     hopper.enableCulling();
 
-    hopper.clearColor(Vec4(0.2, 0.3, 0.3, 1.0));
+    hopper.setClearColor(Vec4(0.2, 0.3, 0.3, 1.0));
 
-    const phongProgram = hopper.createPhongProgram();
-    const basicColorProgram = hopper.createBasicColorProgram();
+    const phongTextureProgram = hopper.createPhongTextureProgram();
 
-    const sphere = hopper.createUVSphere(phongProgram, 1.0, 20, 20);
-    const sphereWireframe = hopper.createUVSphere(basicColorProgram, 1.0, 20, 20);
+    const sphere = hopper.createIcoSphere(phongTextureProgram, 1.0, 5);
 
     hopper.bindPhongMaterialUBO();
     hopper.setPhongMaterial({ ambient: Vec3(0.025, 0.05, 0.1),
@@ -80,11 +142,14 @@ try {
                             intensity: 0.0 });
     hopper.unbindDirLightUBO();
 
-    const rotation0 = Quat().setAxisAngle(Vec3(1.0, 0.0, 0.0), Math.PI / 2);
+    const rotation0 = Quat().setAxisAngle(Vec3(1.0, 0.0, 0.0), -Math.PI / 2);
 
     let rotY = 0;
     hopper.render(dt => {
-        rotY += dt * 0.001;
+        hopper.resize((width, height) => ppStack.resize(width, height));
+        ppStack.bind();
+
+        rotY += dt * 0.0005;
 
         const { linear, quadratic } = Common.genAttenuationFromRange(100.0);
 
@@ -100,33 +165,45 @@ try {
 
         const rotation1 = Quat().setAxisAngle(Vec3(0.0, 1.0, 0.0), rotY * 0.5);
 
-        hopper.resize();
-        hopper.clear();
-
         const projection = Transform.perspective(Common.toRadians(90.0), hopper.getAspect(), 0.1, 100.0);
         const view = Transform.lookAt(Vec3(0.0, 0.0, 2.0), Vec3(0.0, 0.0, 0.0), Vec3(0.0, 1.0, 0.0));
         const model = Transform.fromRotationTranslationScale(rotation1.mul(rotation0), Vec3(0.0, 0.0, 0.0), Vec3(1.0, 1.0, 1.0));
         const normal = Transform.normalMat3FromMat4(view.mul(model));
 
-        phongProgram.use();
+        phongTextureProgram.use();
 
-        phongProgram.updateProjection(projection);
-        phongProgram.updateModelView(view.mul(model));
-        phongProgram.updateNormal(normal);
+        phongTextureProgram.updateProjection(projection);
+        phongTextureProgram.updateModelView(view.mul(model));
+        phongTextureProgram.updateNormal(normal);
+
+        phongTextureProgram.updateAmbientTexTransform(Vec2(0.0, 0.0));
+        phongTextureProgram.updateAmbientTexMultiplier(Vec2(1.0, 1.0));
+
+        phongTextureProgram.updateDiffuseTexTransform(Vec2(0.0, 0.0));
+        phongTextureProgram.updateDiffuseTexMultiplier(Vec2(1.0, 1.0));
+
+        phongTextureProgram.updateSpecularTexTransform(Vec2(0.0, 0.0));
+        phongTextureProgram.updateSpecularTexMultiplier(Vec2(1.0, 1.0));
+
+        phongTextureProgram.updateGamma(ppStack.getGamma());
+
+        phongTextureProgram.setTextures({
+            ambient: ambientTexture,
+            diffuse: diffuseTexture,
+            specular: specularTexture
+        });
 
         sphere.bind();
         sphere.draw();
 
-        basicColorProgram.use();
+        cubemapProgram.use();
+        cubemapProgram.setCubemapTexture(cubemapTexture);
+        cubemapProgram.updateProjection(projection);
+        cubemapProgram.updateView(view);
+        cubemapProgram.updateGamma(ppStack.getGamma());
+        cubemapProgram.draw();
 
-        const model2 = Transform.fromRotationTranslationScale(rotation1.mul(rotation0), Vec3(0.0, 0.0, 0.0), Vec3(1.001, 1.001, 1.001));
-
-        basicColorProgram.updateProjection(projection);
-        basicColorProgram.updateModelView(view.mul(model2));
-        basicColorProgram.updateColor(Vec4(1.0, 1.0, 1.0, 1.0));
-
-        sphereWireframe.bind();
-        sphereWireframe.drawWireframe();
+        ppStack.unbind();
     });
 }
 catch (e) {
