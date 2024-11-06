@@ -1,1 +1,1 @@
-This is a mirror of [saccharine.dev](https://saccharine.dev) in case the server goes down.
+Source of [e954.dev](https://e954.dev).
