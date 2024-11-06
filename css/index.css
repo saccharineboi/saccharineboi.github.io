@@ -10,6 +10,10 @@ body {
     margin: 0 auto;
     line-height: 1.5;
     font-size: 16pt;
+    text-align: justify;
+    font-family: 'Merriweather', serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 img {
@@ -40,4 +44,5 @@ a:hover {
 
 .inline {
     display: inline;
+    margin: 0px 10px;
 }
