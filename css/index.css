@@ -1,0 +1,43 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: url(../gifs/dark.gif);
+    color: white;
+    max-width: 80vw;
+    margin: 0 auto;
+    line-height: 1.5;
+    font-size: 16pt;
+}
+
+img {
+    width: auto;
+    height: 5vh;
+    margin: 10px 20px 0px 0px;
+}
+
+h2 {
+    margin: 20px 0px;
+}
+
+p {
+    margin: 20px 0px;
+}
+
+a {
+    color: yellow;
+}
+
+a:hover {
+    font-weight: bold;
+}
+
+.centered {
+    text-align: center;
+}
+
+.inline {
+    display: inline;
+}
