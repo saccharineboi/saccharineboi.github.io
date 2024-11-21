@@ -5,8 +5,9 @@
 }
 
 body {
-    background-color: black;
+    background-image: url(../gifs/purple.gif);
     font-size: 16pt;
+    text-align: justify;
 }
 
 article {
@@ -16,6 +17,7 @@ article {
     font-size: 1em;
     color: white;
     line-height: 1.5em;
+    background: black;
 }
 
 p {
