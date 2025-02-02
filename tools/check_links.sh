@@ -18,9 +18,9 @@ for link in $links; do
     http_status=$(curl -o /dev/null -s -w "%{http_code}\n" "$link")
 
     if [ "$http_status" -eq 200 ]; then
-        echo "Valid link: $link"
+        echo -e "\033[32mValid link: $link\033[0m"
     else
-        echo "Invalid link: $link (HTTP status: $http_status)"
+        echo -e "\033[31mInvalid link: $link (HTTP status: $http_status)\033[0m"
     fi
 done
 
