@@ -1,0 +1,20 @@
+{
+  "name": "e954",
+  "version": "0.1.0",
+  "description": "Source of [e954.dev](https://e954.dev).",
+  "repository": {
+    "type": "git",
+    "url": "git@github-personal:saccharineboi/saccharineboi.github.io"
+  },
+  "license": "ISC",
+  "author": "saccharineboi",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx live-server --no-browser --port=3000"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
