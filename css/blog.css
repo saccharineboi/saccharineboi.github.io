@@ -4,7 +4,6 @@
 }
 
 body {
-    background-image: url(../gifs/purple.gif);
     font-size: 16pt;
     text-align: justify;
 }
@@ -16,8 +15,8 @@ article {
     font-size: 1em;
     color: white;
     line-height: 1.5em;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
 }
 
 p {
@@ -110,4 +109,16 @@ code {
     color: #DCDCDC;
     margin: 0px;
     padding: 10px;
+}
+
+.black-cat-background {
+    background-image: url(../img/spooky.png);
+}
+
+.dark-sun-background {
+    background-image: url(../img/dark-sun.jpg);
+}
+
+.achilles-background {
+    background-image: url(../img/achilles.jpg);
 }
