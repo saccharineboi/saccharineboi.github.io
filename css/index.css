@@ -39,7 +39,7 @@ a {
 }
 
 a:hover {
-    font-weight: bold;
+    color: orange;
 }
 
 .centered {
