@@ -35,9 +35,12 @@
     <!-- End Cloudflare Web Analytics -->
 </head>
 <body class="max-width-1000 centered black-cat-background">
-    <h1 class="title merriweather-black">The Fall of the House of Vulkan</h1>
 
+    <!-- TITLE -->
+    <h1 class="title merriweather-black">The Fall of the House of Vulkan</h1>
     <h2 id="prologue" class="chapter merriweather-black">Prologue</h2>
+
+    <!-- INTRODUCTION -->
     <article class="merriweather-regular">
     <p>
         <i>
@@ -86,16 +89,16 @@
         A trillion-dollar industry has convinced you that you need to pay <a href="https://www.amazon.com/s?k=rtx+4090" target="_blank">thousands of dollars</a> to create your own simulacra.
     </p>
     <p>
-        And that you also need to write a <a href="https://github.com/SaschaWillems/Vulkan/blob/master/examples/triangle/triangle.cpp" target="_blank">thousand lines</a> of code just to display a single triangle.
+        And that you also need to write a <a href="https://github.com/SaschaWillems/Vulkan/blob/master/examples/triangle/triangle.cpp" target="_blank">thousand lines</a> of code just to see a single triangle.
     </p>
     <p>
         I am here to tell you that there's another way. That you can do all that by yourself.
     </p>
     <p>
-        I know you all probably think of me as a hero, and I accept this responsibility.
+        I know you already think of me as a hero, and I accept this responsibility.
     </p>
     <p class="centered-text big bold italic">
-        In your nightmares you send commands to your VkCommandBuffer, and it brings joy to your heart.
+        In your nightmares you pass raw pointers to your shaders, and it brings joy to your heart.
     </p>
     <p>
         So bring up your terminal, open your favorite text editor, and let's make our own simulator.
@@ -103,7 +106,9 @@
         I am not here to teach you all the technicalities involved
         in compiling and linking the source code, you will have to learn that <a href="https://www.learncpp.com/cpp-tutorial/compiling-your-first-program/" target="_blank">somewhere else</a>.
         Nor will I teach you how to program in <a href="https://a.co/d/8qRAAeX" target="_blank">C</a>.
-        But I <em>will</em> teach you the computer science behind generating images like that of the teapot above.
+        But I <em>will</em> teach you the computer science behind generating images like the teapot above.
+        No GPUs or <a href="https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html" target="_blank">convoluted APIs</a> are needed. There is a great joy in writing your own computer graphics code from scratch,
+        and my hope is to deliver that joy to <em>you</em>.
     </p>
     </article>
 
@@ -112,7 +117,7 @@
     <article class="merriweather-regular">
     <p>
         What is the first step in creating our own <a href="https://en.wikipedia.org/wiki/The_Matrix" target="_blank">matrix</a>?
-        We don't want to build a general-purpose simulation, we want to experience it, too.
+        We don't just want to build a general-purpose simulation, we want to <em>experience it</em>, too.
         That means we need some sort of a portal into another dimension -
         a <a href="https://narnia.fandom.com/wiki/Wardrobe" target="_blank">wardrobe</a> that opens to Narnia.
         There are different ways of accomplishing this. One of them is by creating an image, and then displaying it on an image viewer.
@@ -171,14 +176,14 @@
         which we discuss next.
     </p>
     <p>
-        What <i>is</i> <strong>color</strong>? This may shock you when I say this, but, colors aren't real. They don't actually exist.
+        What <i>is</i> <strong>color</strong>? This may shock you when I say this, but, colors aren't <em>real</em>. They don't actually exist.
         Colors are no more real than the Santa Claus who gifts you presents (or coal!) every Christmas.
         We all partake in a great conspiracy when we open our eyes and see. Colors form an important part of our shared hallucination of the world,
-        apart from money and religion. It's funny when you think about it: the teapot that you saw earlier is a lie that approximates another lie
+        alongside money and religion. It's funny when you think about it: the teapot that you saw earlier is a lie that approximates another lie
         concocted by the buzzing of neurons inside your <a href="https://en.wikipedia.org/wiki/Visual_cortex" target="_blank">visual cortex</a>.
     </p>
     <p>
-        In the real world we have something called the <a href="https://en.wikipedia.org/wiki/Electromagnetic_spectrum" target="_blank">electromagnetic spectrum</a>,
+        In the real world we have something called <a href="https://en.wikipedia.org/wiki/Electromagnetic_spectrum" target="_blank">the electromagnetic spectrum</a>,
         only a small part of which makes up the wavelengths that the human eye can see:
     </p>
     <p>
@@ -186,36 +191,51 @@
     </p>
     <p>
         Worse, the cells within your eye have different sensitivities to different parts of the visible spectrum.
-        The image below which I yoinked from <a href="https://www.simplypsychology.org/what-is-the-trichromatic-theory-of-color-vision.html" target="_blank">simplepsychology.org</a>,
+        The image below (which I yoinked from <a href="https://www.simplypsychology.org/what-is-the-trichromatic-theory-of-color-vision.html" target="_blank">simplepsychology.org</a>)
         illustrates this nicely: 
     </p>
     <p>
         <img alt="Human color sensitivities" src="../img/eye-color-sensitivity.webp">
     </p>
     <p>
-        Yeah I inverted the colors so that it doesn't burn your eyes. Here's the <a href="https://www.simplypsychology.org/wp-content/uploads/eye-color-sensitivity.png" target="_blank">real image</a>.
+        I inverted the colors so that it doesn't burn your eyes. Here's the <a href="https://www.simplypsychology.org/wp-content/uploads/eye-color-sensitivity.png" target="_blank">real image</a>.
         The point is that you may see some colors <em>"brighter"</em> than others.
-        Also due to awkward wiring you have a blind spot:
+        Also, due to the awkward wiring of the optical nerve, you have been gifted a blind spot:
     </p>
     <p>
         <img alt="Human eye blind spot" src="../img/blind-spot.jpg">
     </p>
     <p>
         <i>"But... I don't see any dark patches in my vision?!"</i>, you might say.
-        Well, thanks to this oopsie-poopsie made by the clunky hand of evolution,
+        Well, thanks to this oopsie made by the clunky hand of evolution,
         your brain now has to compensate for this by literally <a href="https://en.wikipedia.org/wiki/Blind_spot_(vision)" target="_blank">filling in</a> the void.
-        Life decided that it would rather hallucinate than to actually see, i.e., you have always lived in your own <a href="https://en.wikipedia.org/wiki/Metaverse" target="_blank">Metaverse</a>,
+        Life decided that it would rather hallucinate than to actually see.
+    </p>
+    <p class="centered-text big bold italic">
+        You are already in the <a href="https://en.wikipedia.org/wiki/Metaverse" target="_blank">Metaverse</a>,
         and you have never really touched grass.
+    </p>
+    <p>
         By the way, cephalopods <a href="https://youtu.be/HATW8xJMxAc?si=E_YykDNmXw-hIPkN" target="_blank">don't have this problem</a>.
     </p>
     <p>
-        What I want you to get from all this is that everything is fake: you are fake, I am fake, your Mom is fake, etc.
+        What I want you to get from all this is that everything that you see is fake: you are fake, I am fake, your Mom is fake...
+    </p>
+    <p>
+        Insofar our delusions don't harm the reproductive success of our species, they will persist,
+        and we seem to be the only species to use technology to indulge ourselves in artificial delusions.
+        We went from <a href="https://en.wikipedia.org/wiki/Lascaux" target="_blank">cave paintings</a> to <a href="https://youtu.be/dYk7byKHSRw?feature=shared" target="_blank">this</a>
+        in the blink of an eye (in cosmological timescales).
+        There is clearly great value in running simulations, especially those that we get to <em>experience</em>.
+        There are philosophers who think the simulation is <a href="https://simulation-argument.com/" target="_blank">the final technology</a>.
+    </p>
+    <p>
         That being said, the chicanery of light and color is often too complex for computers to handle
         (especially when we want to generate our images fast).
         Instead what we do is take the visible part of the electromagnetic spectrum and quantize it with reference to the intensity of three colors:
         <span style="color: red;">RED</span>, <span style="color: green;">GREEN</span>, and <span style="color: blue;">BLUE</span>.
-        We represent these intensities as an integer between 0 and 255.
-        This gives us a total of 256 * 256 * 256 = 16777216 (~16 million) colors to work with.
+        We represent these intensities as an 8-bit unsigned integer between 0 and 255.
+        This gives us a total of 256 * 256 * 256 = 16777216 (~16 million) colors to work with. Not bad.
         Take a look at that PPM image again. The first row is:
     </p>
     <p>
@@ -251,41 +271,271 @@
         We now know that to generate images we will need a structure that stores width, height, and an array of numbers that represents the colors.
         So, let us do that:
     </p>
-    <pre>
-        <code id="code-0" class="source-code-pro-regular">
-        </code>
-    </pre>
-    <p>
-        This creates the following image:
-    </p>
-    <p>
-        <img alt="Output of the code" src="../img/cursedgl_0.svg">
-    </p>
-    </article>
-    <script>
-    const escapeHtml = (unsafe) => {
-        return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-    };
+    <pre><code class="source-code-pro-regular">#include &ltstdio.h&gt
+#include &ltstdint.h&gt
+#include &ltstdlib.h&gt
+#include &ltassert.h&gt
 
-    const CODE_0 = `#include <stdio.h>
-#include <stdint.h>
+typedef struct
+{
+    uint8_t x;
+    uint8_t y;
+    uint8_t z;
+    uint8_t w;
+}
+CgVec4U8;
 
-struct ColorBuffer
+typedef struct
 {
     uint32_t width;
     uint32_t height;
     uint32_t* pixels;
-};
+}
+CgColorBufferU32;
+
+CgColorBufferU32 cgCreateColorBufferU32(uint32_t width,
+                                        uint32_t height)
+{
+    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferU32: width or height is zero");
+
+    CgColorBufferU32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = malloc(width * height * sizeof(uint32_t));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferU32");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}
+
+void cgClearColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+                           CgVec4U8 color)
+{
+    assert(colorBuffer && "cgClearColorBufferU32: colorBuffer is NULL");
+
+    uint32_t pixel = ((uint32_t)color.x) |
+                     ((uint32_t)color.y &lt&lt 8) |
+                     ((uint32_t)color.z &lt&lt 16) |
+                     ((uint32_t)color.w &lt&lt 24);
+
+    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
+    for (uint32_t i = 0; i &lt resolution; ++i) {
+        colorBuffer-&gtpixels[i] = pixel;
+    }
+}
+
+void cgColorBufferU32ToPPM(const CgColorBufferU32* restrict colorBuffer,
+                           const char* restrict path)
+{
+    assert(colorBuffer && "cgColorBufferU32ToPPM: colorBuffer is NULL");
+    assert(path && "cgColorBufferU32ToPPM: path is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        perror("cgColorBufferU32ToPPM");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gtwidth, colorBuffer-&gtheight);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
+    for (uint32_t i = 0; i &lt resolution; ++i) {
+        uint32_t pixel = colorBuffer-&gtpixels[i];
+        uint8_t red = *((uint8_t*)&pixel + 0);
+        uint8_t green = *((uint8_t*)&pixel + 1);
+        uint8_t blue = *((uint8_t*)&pixel + 2);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}
 
 int main()
 {
-
-
+    uint32_t width = 320;
+    uint32_t height = 240;
+    CgVec4U8 clearColor = { 255, 150, 255, 255 };
+    CgColorBufferU32 colorBuffer = cgCreateColorBufferU32(width, height);
+    cgClearColorBufferU32(&colorBuffer, clearColor);
+    cgColorBufferU32ToPPM(&colorBuffer, "sample.ppm");
     return 0;
+}</code></pre>
+    <p>
+        This creates the following image:
+    </p>
+    <p>
+        <img alt="Output of the code" src="../img/cursedgl_0.png">
+    </p>
+    <p>
+        I converted the PPM image to <a href="https://en.wikipedia.org/wiki/PNG" target="_blank">PNG</a> since some browsers can't render the PPM format.
+    </p>
+    <p>
+        There is a long way to go before our image starts to look like a teapot. But we already have the fundamental structures:
+    </p>
+    <pre><code class="source-code-pro-regular">typedef struct
+{
+    uint8_t x;
+    uint8_t y;
+    uint8_t z;
+    uint8_t w;
 }
-`;
+CgVec4U8;</code></pre>
+    <p>
+        Since C doesn't have namespaces, I name my structures with a two-letter identifier <span class="inline-code">Cg</span> to prevent naming conflicts.
+        Here, <span class="inline-code">Cg</span> stands for "Computer graphics", but you may use your own naming scheme if you wish.
+        Next, <span class="inline-code">Vec4</span> stands for the 4-dimensional vector
+        (if you need some refreshing on vectors then <a href="https://www.realtimerendering.com/Real-Time_Rendering_4th-Appendices.pdf" target="_blank">click here</a>).
+        Finally, I indicate the type of the elements in the structure: <span class="inline-code">U8</span>, which stands for 8-bit unsigned integer.
+    </p>
+    <p>
+        Therefore, a 4D floating-point vector can be defined as <span class="inline-code">CgVec4F32</span>:
+    </p>
+    <pre><code class="source-code-pro-regular">typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float w;
+}
+CgVec4F32;</code></pre>
+    <p>
+        The struct <span class="inline-code">CgColorBufferU32</span> follows the same convention.
+        After all, we need a place to <em>store</em> the image, so we will use the <span class="inline-code">pixels</span> pointer
+        to refer to some place in memory where the image is stored:
+    </p>
+    <pre><code class="source-code-pro-regular">typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    uint32_t* pixels;
+}
+CgColorBufferU32;</code></pre>
+    <p>
+        Each pixel is defined as an unsigned 32-bit integer (8-bit per channel, with an alpha value that we will discuss later).
+    </p>
+    <p>
+        Then we define the <span class="inline-code">cgCreateColorBufferU32</span> function that allocates a new buffer to store the image.
+        Note that the <span class="inline-code">cgCreateColorBufferU32</span> doesn't <em>initialize</em> the buffer,
+        it only <em>allocates</em> enough memory to <em>store</em> the image.
+        This goes against the <strong>"never forget initializing your variables"</strong> mantra, but
+        the values of the color buffer are likely to be discarded and written to a lot of times,
+        and this can seriously slow down the simulation since the number of pixels can be quite high.
+        Instead we have another function that initializes the values of the color buffer given a single color value:
+        <span class="inline-code">cgClearColorBufferU32</span>. Note how the 32-bit pixels are generated:
+    </p>
+    <pre><code class="source-code-pro-regular">uint32_t pixel = ((uint32_t)color.x) |
+                 ((uint32_t)color.y &lt&lt 8) |
+                 ((uint32_t)color.z &lt&lt 16) |
+                 ((uint32_t)color.w &lt&lt 24);</code></pre>
+    <p>
+        Here the <strong>x</strong>, <strong>y</strong>, <strong>z</strong>, <strong>w</strong>
+        values correspond to the red, green, blue, and alpha values.
+        What is <em>alpha</em>? Roughly speaking, the alpha values represent the transparency of the image.
+        That is to say, if there was <em>another</em> image behind <em>our</em> image, then the alpha values
+        of our image would determine <em>the extent to which</em> the colors of the background image would <em>bleed through</em> our image.
+        This description is a little abstract, but don't worry, we will look at transparency again.
+    </p>
+    <p>
+        Each <span class="inline-code">uint32_t pixel</span> stores the red value in its least significant 8 bits
+        (I assume that both you and I are programming in a little-endian machine).
+        Why? For no particular reason. Different applications may use different pixel layouts, and switching between layouts is trivial.
+        But once the layout is determined, we have to be consistent, and we are: our function <span class="inline-code">cgColorBufferU32ToPPM</span>
+        assumes this:
+    </p>
+    <pre><code class="source-code-pro-regular">uint32_t pixel = colorBuffer-&gtpixels[i];
+uint8_t red = *((uint8_t*)&pixel + 0);
+uint8_t green = *((uint8_t*)&pixel + 1);
+uint8_t blue = *((uint8_t*)&pixel + 2);
+fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
+    <p>
+        An image with a single color is kind of boring though. We can write another function <span class="inline-code">cgGradientColorBufferU32</span>
+        that draws a gradient across the image:
+    </p>
+    <pre><code class="source-code-pro-regular">void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+                              CgVec4U8 topLeftColor,
+                              CgVec4U8 topRightColor,
+                              CgVec4U8 bottomLeftColor,
+                              CgVec4U8 bottomRightColor)
+{
+    assert(colorBuffer && "cgGradientColorBufferU32: colorBuffer is NULL");
 
-    document.querySelector("#code-0").innerHTML = escapeHtml(CODE_0);
-    </script>
+    CgVec4F32 topLeftColorF32 = cgConvertVec4U8ToF32(topLeftColor);
+    CgVec4F32 topRightColorF32 = cgConvertVec4U8ToF32(topRightColor);
+    CgVec4F32 bottomLeftColorF32 = cgConvertVec4U8ToF32(bottomLeftColor);
+    CgVec4F32 bottomRightColorF32 = cgConvertVec4U8ToF32(bottomRightColor);
+
+    for (uint32_t i = 0; i &lt colorBuffer->width; ++i) {
+        float x = (float)i / (float)colorBuffer->width;
+        for (uint32_t j = 0; j &lt colorBuffer->height; ++j) {
+            float y = (float)j / (float)colorBuffer->height;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColorF32, topRightColorF32, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColorF32, bottomRightColorF32, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            CgVec4U8 color = cgConvertVec4F32ToU8(finalColor);
+            uint32_t pixel = cgConvertVec4U8ToU32(color);
+            colorBuffer->pixels[j * colorBuffer->width + i] = pixel;
+        }
+    }
+}</code></pre>
+    <p>
+        We can create gradients by linearly interpolating between the given color values.
+        First, we convert our vectors from <span class="inline-code">CgVec4U8</span> to <span class="inline-code">CgVec4F32</span>
+        using <span class="inline-code">cgConvertVec4U8ToF32</span>:
+    </p>
+    <pre><code class="source-code-pro-regular">CgVec4F32 cgConvertVec4U8ToF32(CgVec4U8 v)
+{
+    CgVec4F32 r = { .x = (float)v.x,
+                    .y = (float)v.y,
+                    .z = (float)v.z,
+                    .w = (float)v.w };
+    return r;
+}</code></pre>
+    <p>
+        For interpolation we need values between 0.0 and 1.0. We can get those values by dividing the index of the current pixel (i and j)
+        by the width (for the horizontal amount) and by the height (for the vertical amount) of the image.
+        Once interpolated, we convert the <span class="inline-code">CgVec4F32</span> back to <span class="inline-code">CgVec4U8</span>
+        using <span class="inline-code">cgConvertVec4F32ToU8</span>:
+    </p>
+    <pre><code class="source-code-pro-regular">CgVec4U8 cgConvertVec4F32ToU8(CgVec4F32 v)
+{
+    CgVec4U8 r = { .x = (uint8_t)v.x,
+                   .y = (uint8_t)v.y,
+                   .z = (uint8_t)v.z,
+                   .w = (uint8_t)v.w };
+    return r;
+}</code></pre>
+    <p>
+        But since we store pixels as <span class="inline-code">uint32_t</span> values, we need to convert our <span class="inline-code">CgVec4U8</span>
+        to a 32-bit unsigned integer via <span class="inline-code">cgConvertVec4U8ToU32</span>:
+    </p>
+    <pre><code class="source-code-pro-regular">uint32_t cgConvertVec4U8ToU32(CgVec4U8 color)
+{
+    uint32_t pixel = ((uint32_t)color.x) |
+                     ((uint32_t)color.y &lt&lt 8) |
+                     ((uint32_t)color.z &lt&lt 16) |
+                     ((uint32_t)color.w &lt&lt 24);
+    return pixel;
+}</code></pre>
+    <p>
+        If we use <span style="color: red;">RED</span> for the top-left color,
+        <span style="color: green;">GREEN</span> for the top-right color,
+        <span style="color: blue;">BLUE</span> for the bottom-left color, and
+        <span style="color: yellow;">YELLOW</span> for the bottom-right color, then we will get the following image:
+    </p>
+    <p>
+        <img alt="Output of the code" src="../img/cursedgl_1.png">
+    </p>
+    <p>
+        Now things are getting more interesting! But before we proceed, we need to touch on a few points.
+        Most software needs some scaffolding, and our <em>simulator</em> is no different.
+    </p>
+    </article>
+
+    <!-- FLOATING-POINT BUFFERS -->
+    <h2 id="floating-point-buffers" class="chapter merriweather-black">Floating-point Buffers</h2>
+    <article class="merriweather-regular">
+    </article>
 </body>
 </html>
