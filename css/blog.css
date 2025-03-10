@@ -1,3 +1,11 @@
+::selection {
+    background-color: #896fc8;
+}
+
+::-moz-selection {
+    background-color: #896fc8;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -15,8 +23,8 @@ article {
     font-size: 1em;
     color: white;
     line-height: 1.5em;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(100px);
+    -webkit-backdrop-filter: blur(100px);
 }
 
 p {
@@ -24,7 +32,7 @@ p {
 }
 
 a {
-    color: orange;
+    color: pink;
     text-decoration: none;
 }
 
@@ -37,7 +45,7 @@ img {
 }
 
 img:hover {
-    outline: 3px solid orange;
+    outline: 3px solid pink;
 }
 
 table {
@@ -66,19 +74,25 @@ code {
     margin: 10px;
     font-size: 2em;
     font-weight: bold;
-    color: white;
+    color: pink;
+    backdrop-filter: blur(100px);
+    -webkit-backdrop-filter: blur(100px);
+    border: 1px solid white;
     text-transform: uppercase;
+    text-decoration: underline;
 }
 
 .chapter {
     font-size: 1.5em;
     font-weight: bold;
-    color: white;
+    color: pink;
+    backdrop-filter: blur(100px);
+    -webkit-backdrop-filter: blur(100px);
+    border: 1px solid white;
     text-decoration: underline;
     margin: 20px 10px;
     padding: 10px;
     text-align: center;
-    text-transform: uppercase;
 }
 
 .centered {
@@ -112,7 +126,7 @@ code {
 }
 
 .black-cat-background {
-    background-image: url(../img/spooky.png);
+    background-image: url(../img/spooky.jpg);
 }
 
 .dark-sun-background {
