@@ -98,7 +98,7 @@
         I know you already think of me as a hero, and I accept this responsibility.
     </p>
     <p class="centered-text big bold italic">
-        In your nightmares you pass raw pointers to your shaders, and it brings joy to your heart.
+        In your nightmares you use DLSS to upscale your renders, and it brings joy to your heart.
     </p>
     <p>
         So bring up your terminal, open your favorite text editor, and let's make our own simulator.
@@ -222,7 +222,7 @@
         What I want you to get from all this is that everything that you see is fake: you are fake, I am fake, your Mom is fake...
     </p>
     <p>
-        Insofar our delusions don't harm the reproductive success of our species, they will persist,
+        As long as our delusions don't harm the reproductive success of our species, they will persist,
         and we seem to be the only species to use technology to indulge ourselves in artificial delusions.
         We went from <a href="https://en.wikipedia.org/wiki/Lascaux" target="_blank">cave paintings</a> to <a href="https://youtu.be/dYk7byKHSRw?feature=shared" target="_blank">this</a>
         in the blink of an eye (in cosmological timescales).
@@ -231,11 +231,14 @@
     </p>
     <p>
         That being said, the chicanery of light and color is often too complex for computers to handle
-        (especially when we want to generate our images fast).
-        Instead what we do is take the visible part of the electromagnetic spectrum and quantize it with reference to the intensity of three colors:
-        <span style="color: red;">RED</span>, <span style="color: green;">GREEN</span>, and <span style="color: blue;">BLUE</span>.
-        We represent these intensities as an 8-bit unsigned integer between 0 and 255.
+        (especially when we want to generate our images <em>fast</em>).
+        Instead what we do is take the visible part of the electromagnetic spectrum and quantize it based on the intensity of three colors:
+        <span style="color: red;">RED</span>, <span style="color: green;">GREEN</span>, and <span style="color: blue;">BLUE</span>,
+        to the much chagrin of <a href="https://en.wikipedia.org/wiki/Tetrachromacy" target="_blank">tetrachromats</a>.
+        We represent each of these intensities as an 8-bit unsigned integer between 0 and 255.
         This gives us a total of 256 * 256 * 256 = 16777216 (~16 million) colors to work with. Not bad.
+    </p>
+    <p>
         Take a look at that PPM image again. The first row is:
     </p>
     <p>
@@ -262,7 +265,7 @@
     </p>
     <p>
         This is the <span style="color: green;">GREEN</span> color.
-        When we <em>interpret</em> the color information together with the width and the height values, we get the following image:
+        When we <em>interpret</em> the color information together with the width and the height of the image, we get the following picture:
     </p>
     <p>
         <img alt="PPM image example" src="../img/ppm.svg">
@@ -361,13 +364,14 @@ int main()
     return 0;
 }</code></pre>
     <p>
-        This creates the following image:
+        Running the code above creates the image below:
     </p>
     <p>
         <img alt="Output of the code" src="../img/cursedgl_0.png">
     </p>
     <p>
-        I converted the PPM image to <a href="https://en.wikipedia.org/wiki/PNG" target="_blank">PNG</a> since some browsers can't render the PPM format.
+        I converted the PPM to <a href="https://en.wikipedia.org/wiki/PNG" target="_blank">PNG</a> since web browsers can't render PPM images
+        (maybe some can, but <a href="https://www.mozilla.org/en-US/firefox/" target="_blank">firefox</a> couldn't).
     </p>
     <p>
         There is a long way to go before our image starts to look like a teapot. But we already have the fundamental structures:
@@ -384,7 +388,8 @@ CgVec4U8;</code></pre>
         Since C doesn't have namespaces, I name my structures with a two-letter identifier <span class="inline-code">Cg</span> to prevent naming conflicts.
         Here, <span class="inline-code">Cg</span> stands for "Computer graphics", but you may use your own naming scheme if you wish.
         Next, <span class="inline-code">Vec4</span> stands for the 4-dimensional vector
-        (if you need some refreshing on vectors then <a href="https://www.realtimerendering.com/Real-Time_Rendering_4th-Appendices.pdf" target="_blank">click here</a>).
+        (if you need some refreshing on vectors, <a href="https://www.realtimerendering.com/" target="_blank">realtimerendering.com</a>
+        has a nice <a href="https://www.realtimerendering.com/Real-Time_Rendering_4th-Appendices.pdf" target="_blank">PDF</a> that you can read).
         Finally, I indicate the type of the elements in the structure: <span class="inline-code">U8</span>, which stands for 8-bit unsigned integer.
     </p>
     <p>
@@ -418,9 +423,9 @@ CgColorBufferU32;</code></pre>
         Note that the <span class="inline-code">cgCreateColorBufferU32</span> doesn't <em>initialize</em> the buffer,
         it only <em>allocates</em> enough memory to <em>store</em> the image.
         This goes against the <strong>"never forget initializing your variables"</strong> mantra, but
-        the values of the color buffer are likely to be discarded and written to a lot of times,
-        and this can seriously slow down the simulation since the number of pixels can be quite high.
-        Instead we have another function that initializes the values of the color buffer given a single color value:
+        the values of the color buffer are likely to be discarded and written to anyway,
+        so it doesn't really make sense to initialize it with default color values.
+        Instead we have another function that updates the color buffer given a single color:
         <span class="inline-code">cgClearColorBufferU32</span>. Note how the 32-bit pixels are generated:
     </p>
     <pre><code class="source-code-pro-regular">uint32_t pixel = ((uint32_t)color.x) |
@@ -429,18 +434,19 @@ CgColorBufferU32;</code></pre>
                  ((uint32_t)color.w &lt&lt 24);</code></pre>
     <p>
         Here the <strong>x</strong>, <strong>y</strong>, <strong>z</strong>, <strong>w</strong>
-        values correspond to the red, green, blue, and alpha values.
-        What is <em>alpha</em>? Roughly speaking, the alpha values represent the transparency of the image.
+        values correspond to the <span style="color: red;">red</span>, <span style="color: green;">green</span>,
+        <span style="color: blue;">blue</span>, and <span style="color: rgba(255, 255, 255, 0.5);">alpha</span> values.
+        What is <em>alpha</em>? Roughly speaking, the alpha represents the transparency of the image.
         That is to say, if there was <em>another</em> image behind <em>our</em> image, then the alpha values
         of our image would determine <em>the extent to which</em> the colors of the background image would <em>bleed through</em> our image.
-        This description is a little abstract, but don't worry, we will look at transparency again.
+        This description is a little abstract, but don't worry, we will look at transparency in more detail later.
     </p>
     <p>
         Each <span class="inline-code">uint32_t pixel</span> stores the red value in its least significant 8 bits
-        (I assume that both you and I are programming in a little-endian machine).
+        (assuming that we are programming in a <a href="https://en.wikipedia.org/wiki/Endianness" target="_blank">little-endian</a> machine).
         Why? For no particular reason. Different applications may use different pixel layouts, and switching between layouts is trivial.
         But once the layout is determined, we have to be consistent, and we are: our function <span class="inline-code">cgColorBufferU32ToPPM</span>
-        assumes this:
+        assumes the red will be found in the least significant 8 bits of the given <span class="inline-code">uint32_t</span> value:
     </p>
     <pre><code class="source-code-pro-regular">uint32_t pixel = colorBuffer-&gtpixels[i];
 uint8_t red = *((uint8_t*)&pixel + 0);
@@ -480,9 +486,32 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     }
 }</code></pre>
     <p>
-        We can create gradients by linearly interpolating between the given color values.
-        First, we convert our vectors from <span class="inline-code">CgVec4U8</span> to <span class="inline-code">CgVec4F32</span>
-        using <span class="inline-code">cgConvertVec4U8ToF32</span>:
+        We can create gradients by <em>linearly interpolating</em> between the given color values.
+        To understand linear interpolation better let us interpolate between two real values, say <span class="inline-code">a</span>
+        and <span class="inline-code">b</span>. We can define <span class="inline-code">k</span> as another real value,
+        between 0.0 and 1.0, that denotes the <em>amount</em> of interpolation to do.
+        You can think of <span class="inline-code">k</span> as the <em>distance</em> to travel from
+        <span class="inline-code">a</span> to <span class="inline-code">b</span>.
+        When <span class="inline-code">k</span> equals 0, we don't travel at all, so we return <span class="inline-code">a</span>.
+        When <span class="inline-code">k</span> equals 1, then we travel the full distance, and thus we return <span class="inline-code">b</span>.
+        If <span class="inline-code">k</span> equals 0.5, then we travel half the distance, so return the half of <span class="inline-code">a</span>
+        plus the half of <span class="inline-code">b</span>.
+    </p>
+    <p>
+        In our case we are trying to interpolate across a two-dimensional surface (our image), so we have two <span class="inline-code">k</span>s.
+        We can calculate these <span class="inline-code">k</span>s by dividing the position of the current pixel
+        (<span class="inline-code">i</span> and <span class="inline-code">j</span>) by the width and the height of our image.
+        This works because <span class="inline-code">i</span> will always be between 0 and the width of the image,
+        so dividing <span class="inline-code">i</span> by the width will always yield a value between 0.0 and 1.0
+        (technically speaking, we will never reach 1.0, since <span class="inline-code">i</span> will never be the width of the image, but this is okay, because it will get
+        very close to 1.0 anyway. If you're bothered by this, you can instead divide by (width - 1), which <em>will</em> produce the correct interpolation).
+        The same remark applies to <span class="inline-code">j</span>: diving <span class="inline-code">j</span> by the height of the image will also produce a value between 0.0 and 1.0.
+    </p>
+    <p>
+        Now we can use these <span class="inline-code">k</span>s to linearly interpolate between the given color values.
+        Because <span class="inline-code">k</span>s are floating-point values, it's best that we convert our colors to their
+        floating-point equivalents as well, lest we litter the codebase with <a href="https://stackoverflow.com/questions/7558837/what-exactly-is-a-type-cast-in-c-c" target="_blank">type casts</a>.
+        Instead we hide the casts in functions, e.g. with <span class="inline-code">cgConvertVec4U8ToF32</span>:
     </p>
     <pre><code class="source-code-pro-regular">CgVec4F32 cgConvertVec4U8ToF32(CgVec4U8 v)
 {
@@ -493,8 +522,24 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     return r;
 }</code></pre>
     <p>
-        For interpolation we need values between 0.0 and 1.0. We can get those values by dividing the index of the current pixel (i and j)
-        by the width (for the horizontal amount) and by the height (for the vertical amount) of the image.
+        The linear interpolation is computed by the <span class="inline-code">cgLerpVec4F32</span> function:
+    </p>
+    <pre><code class="source-code-pro-regular">CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+                        CgVec4F32 q,
+                        float k)
+{
+    CgVec4F32 r = {
+        .x = (1.0f - k) * p.x + k * q.x,
+        .y = (1.0f - k) * p.y + k * q.y,
+        .z = (1.0f - k) * p.z + k * q.z,
+        .w = (1.0f - k) * p.w + k * q.w
+    };
+    return r;
+}</code></pre>
+    <p>
+        Notice how when <span class="inline-code">k</span> equals 0, we return the first value (<span class="inline-code">p</span>),
+        and when it equals 1, we return the second value (<span class="inline-code">q</span>), and for the remaining values of
+        <span class="inline-code">k</span> it is a mixture of both.
         Once interpolated, we convert the <span class="inline-code">CgVec4F32</span> back to <span class="inline-code">CgVec4U8</span>
         using <span class="inline-code">cgConvertVec4F32ToU8</span>:
     </p>
@@ -522,20 +567,27 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         If we use <span style="color: red;">RED</span> for the top-left color,
         <span style="color: green;">GREEN</span> for the top-right color,
         <span style="color: blue;">BLUE</span> for the bottom-left color, and
-        <span style="color: yellow;">YELLOW</span> for the bottom-right color, then we will get the following image:
+        <span style="color: yellow;">YELLOW</span> for the bottom-right color, then <span class="inline-code">cgGradientColorBufferU32</span> will produce the following image:
     </p>
     <p>
         <img alt="Output of the code" src="../img/cursedgl_1.png">
     </p>
     <p>
-        Now things are getting more interesting! But before we proceed, we need to touch on a few points.
-        Most software needs some scaffolding, and our <em>simulator</em> is no different.
+        You need to understand interpolation <em>well</em>, because we will use it again, albeit for a different geometry.
     </p>
     </article>
 
     <!-- FLOATING-POINT BUFFERS -->
     <h2 id="floating-point-buffers" class="chapter merriweather-black">Floating-point Buffers</h2>
     <article class="merriweather-regular">
+    <p>
+        So far we have been storing our color values in <span class="inline-code">CgColorBufferU32</span>,
+        and while there isn't anything inherently wrong with 8-bit colors, it is often much easier to work
+        with floating-point values. We have already seen this in the <span class="inline-code">cgGradientColorBufferU32</span>
+        function. Linear interpolation works best with floating-point values as the <em>amount to interpolate</em> between two values
+        is best given by a real number between 0.0 and 1.0. In our case we could have simply defined a <span class="inline-code">uint8_t</span>
+        variant of the 
+    </p>
     </article>
 </body>
 </html>
