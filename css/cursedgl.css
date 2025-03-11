@@ -1,0 +1,23 @@
+::selection {
+    background-color: #896fc8;
+}
+
+::-moz-selection {
+    background-color: #896fc8;
+}
+
+a {
+    color: pink;
+}
+
+img:hover {
+    outline: 3px solid pink;
+}
+
+.title {
+    color: pink;
+}
+
+.chapter {
+    color: pink;
+}

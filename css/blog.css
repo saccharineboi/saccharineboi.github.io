@@ -1,11 +1,3 @@
-::selection {
-    background-color: #896fc8;
-}
-
-::-moz-selection {
-    background-color: #896fc8;
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -32,7 +24,6 @@ p {
 }
 
 a {
-    color: pink;
     text-decoration: none;
 }
 
@@ -42,10 +33,6 @@ a:hover, a:active {
 
 img {
     width: 100%;
-}
-
-img:hover {
-    outline: 3px solid pink;
 }
 
 table {
@@ -63,7 +50,6 @@ code {
     font-size: 12pt;
 }
 
-/* formatting */
 .max-width-1000 {
     max-width: 1000px;
 }
@@ -74,7 +60,6 @@ code {
     margin: 10px;
     font-size: 2em;
     font-weight: bold;
-    color: pink;
     backdrop-filter: blur(100px);
     -webkit-backdrop-filter: blur(100px);
     border: 1px solid white;
@@ -85,7 +70,6 @@ code {
 .chapter {
     font-size: 1.5em;
     font-weight: bold;
-    color: pink;
     backdrop-filter: blur(100px);
     -webkit-backdrop-filter: blur(100px);
     border: 1px solid white;
