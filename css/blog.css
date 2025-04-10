@@ -1,0 +1,46 @@
+body {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: Garamond, serif;
+    padding: 50px;
+}
+
+pre {
+    overflow-x: auto;
+}
+
+a {
+    color: darkblue;
+}
+
+a:hover {
+    color: darkgreen;
+}
+
+img {
+    width: 100%;
+}
+
+h1 {
+    text-transform: uppercase;
+}
+
+.mono {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.inline-code {
+    color: white;
+    background-color: black;
+}
+
+.home-btn {
+    background-color: black;
+    padding: 5px;
+    margin-bottom: 20px;
+}
+
+.home-btn a {
+    color: white;
+    text-decoration: none;
+}
