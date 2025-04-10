@@ -14,22 +14,45 @@
     <meta name="apple-mobile-web-app-title" content="E954" />
     <link rel="manifest" href="../favico/site.webmanifest" />
 
-    <!-- fonts-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
-
     <!-- code highlighting stuff -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/ir-black.min.css" integrity="sha512-koyJNDRWiSkXWV9VpMDJXZnwgO5wB1VsSw5O7XpkYFBL9Yjp6QiotG1CPuD3iHbOw5a3obVP5guUzxhJA0Dmhw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/vs.min.css" integrity="sha512-AVoZ71dJLtHRlsgWwujPT1hk2zxtFWsPlpTPCc/1g0WgpbmlzkqlDFduAvnOV4JJWKUquPc1ZyMc5eq4fRnKOQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/arduino-light.min.css" integrity="sha512-M4nH9C7TRCVWLGruh9fHTfYxGWDiKpOGNjpfC9irhF06aLiYmJczZlW+/6IKOZ+75AGk4Wn4clgd6J13T0zzXg==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js" integrity="sha512-6yoqbrcLAHDWAdQmiRlHG4+m0g/CT/V9AGyxabG8j7Jk8j3r3K6due7oqpiRMZqcYe9WM2gPcaNNxnl2ux+3tA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/c.min.js" integrity="sha512-Ny9z3+WJkmC2xW098BNYhPajzsf8iBika/+58Mh4lHCF/it92UR32xhytP4I/yxKmF1fkcEgIF87qbGyz1nmDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>hljs.highlightAll();</script>
     
-    <!-- custom styles -->
-    <link rel="stylesheet" href="../css/fonts.css">
-    <link rel="stylesheet" href="../css/blog.css">
-    <link rel="stylesheet" href="../css/cursedgl.css">
+    <style>
+        body {
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: Garamond, serif;
+        }
+
+        pre {
+            overflow-x: auto;
+        }
+
+        a {
+            color: darkblue;
+        }
+
+        a:hover {
+            color: darkgreen;
+        }
+        
+        img {
+            width: 800px;
+        }
+
+        .mono {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .inline-code {
+            color: white;
+            background-color: black;
+        }
+    </style>
 
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c4b2320f0ee04848bb6f51954d84c0d8"}'></script>
@@ -42,7 +65,7 @@
     <h2 id="prologue" class="chapter merriweather-black">Prologue</h2>
 
     <!-- INTRODUCTION -->
-    <article class="merriweather-regular">
+    <article>
     <p>
         <i>
             During the whole of a dull, dark, and soundless day in the autumn of the year, when the clouds hung oppressively low in the heavens,
@@ -115,7 +138,7 @@
 
     <!-- FIRST PRINCIPLES -->
     <h2 id="first-principles" class="chapter merriweather-black">First Principles</h2>
-    <article class="merriweather-regular">
+    <article>
     <p>
         What is the first step in creating our own <a href="https://en.wikipedia.org/wiki/The_Matrix" target="_blank">matrix</a>?
         We don't just want to build a general-purpose simulation, we want to <em>experience it</em>, too.
@@ -275,7 +298,7 @@
         We now know that to generate images we will need a structure that stores width, height, and an array of numbers that represents the colors.
         So, let us do that:
     </p>
-    <pre><code class="source-code-pro-regular">#include &ltstdio.h&gt
+    <pre><code class="mono">#include &ltstdio.h&gt
 #include &ltstdint.h&gt
 #include &ltstdlib.h&gt
 #include &ltassert.h&gt
@@ -377,7 +400,7 @@ int main()
     <p>
         There is a long way to go before our image starts to look like a teapot. But we already have the fundamental structures:
     </p>
-    <pre><code class="source-code-pro-regular">typedef struct
+    <pre><code class="mono">typedef struct
 {
     uint8_t x;
     uint8_t y;
@@ -396,7 +419,7 @@ CgVec4U8;</code></pre>
     <p>
         Therefore, a 4D floating-point vector can be defined as <span class="inline-code">CgVec4F32</span>:
     </p>
-    <pre><code class="source-code-pro-regular">typedef struct
+    <pre><code class="mono">typedef struct
 {
     float x;
     float y;
@@ -409,7 +432,7 @@ CgVec4F32;</code></pre>
         After all, we need a place to <em>store</em> the image, so we will use the <span class="inline-code">pixels</span> pointer
         to refer to some place in memory where the image is stored:
     </p>
-    <pre><code class="source-code-pro-regular">typedef struct
+    <pre><code class="mono">typedef struct
 {
     uint32_t width;
     uint32_t height;
@@ -429,14 +452,14 @@ CgColorBufferU32;</code></pre>
         Instead we have another function that updates the color buffer given a single color:
         <span class="inline-code">cgClearColorBufferU32</span>. Note how the 32-bit pixels are generated:
     </p>
-    <pre><code class="source-code-pro-regular">uint32_t pixel = ((uint32_t)color.x) |
+    <pre><code class="mono">uint32_t pixel = ((uint32_t)color.x) |
                  ((uint32_t)color.y &lt&lt 8) |
                  ((uint32_t)color.z &lt&lt 16) |
                  ((uint32_t)color.w &lt&lt 24);</code></pre>
     <p>
         Here the <strong>x</strong>, <strong>y</strong>, <strong>z</strong>, <strong>w</strong>
         values correspond to the <span style="color: red;">red</span>, <span style="color: green;">green</span>,
-        <span style="color: blue;">blue</span>, and <span style="color: rgba(255, 255, 255, 0.5);">alpha</span> values.
+        <span style="color: blue;">blue</span>, and <span>alpha</span> values.
         What is <em>alpha</em>? Roughly speaking, the alpha represents the transparency of the image.
         That is to say, if there was <em>another</em> image behind <em>our</em> image, then the alpha values
         of our image would determine <em>the extent to which</em> the colors of the background image would <em>bleed through</em> our image.
@@ -449,7 +472,7 @@ CgColorBufferU32;</code></pre>
         But once the layout is determined, we have to be consistent, and we are: our function <span class="inline-code">cgColorBufferU32ToPPM</span>
         assumes the red will be found in the least significant 8 bits of the given <span class="inline-code">uint32_t</span> value:
     </p>
-    <pre><code class="source-code-pro-regular">uint32_t pixel = colorBuffer-&gtpixels[i];
+    <pre><code class="mono">uint32_t pixel = colorBuffer-&gtpixels[i];
 uint8_t red = *((uint8_t*)&pixel + 0);
 uint8_t green = *((uint8_t*)&pixel + 1);
 uint8_t blue = *((uint8_t*)&pixel + 2);
@@ -458,7 +481,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         An image with a single color is kind of boring though. We can write another function <span class="inline-code">cgGradientColorBufferU32</span>
         that draws a gradient across the image:
     </p>
-    <pre><code class="source-code-pro-regular">void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+    <pre><code class="mono">void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
                               CgVec4U8 topLeftColor,
                               CgVec4U8 topRightColor,
                               CgVec4U8 bottomLeftColor,
@@ -514,7 +537,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         floating-point equivalents as well, lest we litter the codebase with <a href="https://stackoverflow.com/questions/7558837/what-exactly-is-a-type-cast-in-c-c" target="_blank">type casts</a>.
         Instead we hide the casts in functions, e.g. with <span class="inline-code">cgConvertVec4U8ToF32</span>:
     </p>
-    <pre><code class="source-code-pro-regular">CgVec4F32 cgConvertVec4U8ToF32(CgVec4U8 v)
+    <pre><code class="mono">CgVec4F32 cgConvertVec4U8ToF32(CgVec4U8 v)
 {
     CgVec4F32 r = { .x = (float)v.x,
                     .y = (float)v.y,
@@ -525,7 +548,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     <p>
         The linear interpolation is computed by the <span class="inline-code">cgLerpVec4F32</span> function:
     </p>
-    <pre><code class="source-code-pro-regular">CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+    <pre><code class="mono">CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
                         CgVec4F32 q,
                         float k)
 {
@@ -544,7 +567,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         Once interpolated, we convert the <span class="inline-code">CgVec4F32</span> back to <span class="inline-code">CgVec4U8</span>
         using <span class="inline-code">cgConvertVec4F32ToU8</span>:
     </p>
-    <pre><code class="source-code-pro-regular">CgVec4U8 cgConvertVec4F32ToU8(CgVec4F32 v)
+    <pre><code class="mono">CgVec4U8 cgConvertVec4F32ToU8(CgVec4F32 v)
 {
     CgVec4U8 r = { .x = (uint8_t)v.x,
                    .y = (uint8_t)v.y,
@@ -556,7 +579,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         But since we store pixels as <span class="inline-code">uint32_t</span> values, we need to convert our <span class="inline-code">CgVec4U8</span>
         to a 32-bit unsigned integer via <span class="inline-code">cgConvertVec4U8ToU32</span>:
     </p>
-    <pre><code class="source-code-pro-regular">uint32_t cgConvertVec4U8ToU32(CgVec4U8 color)
+    <pre><code class="mono">uint32_t cgConvertVec4U8ToU32(CgVec4U8 color)
 {
     uint32_t pixel = ((uint32_t)color.x) |
                      ((uint32_t)color.y &lt&lt 8) |
@@ -580,7 +603,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
 
     <!-- FLOATING-POINT BUFFERS -->
     <h2 id="floating-point-buffers" class="chapter merriweather-black">Floating-point Buffers</h2>
-    <article class="merriweather-regular">
+    <article>
     <p>
         So far we have been storing our color values in <span class="inline-code">CgColorBufferU32</span>,
         and while there isn't anything inherently wrong with 8-bit colors, it is often much easier to work
