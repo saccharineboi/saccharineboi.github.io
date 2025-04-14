@@ -25,13 +25,18 @@ h1 {
     text-transform: uppercase;
 }
 
-.mono {
-    font-family: 'Courier New', Courier, monospace;
+table {
+    border-collapse: collapse;
+    text-align: center;
 }
 
-.inline-code {
-    color: white;
-    background-color: black;
+td {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.mono {
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .home-btn {
