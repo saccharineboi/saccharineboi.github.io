@@ -23,6 +23,9 @@
     
     <link rel="stylesheet" href="../css/blog.css">
 
+    <!-- For equations -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c4b2320f0ee04848bb6f51954d84c0d8"}'></script>
     <!-- End Cloudflare Web Analytics -->
@@ -32,9 +35,12 @@
 
     <!-- TITLE -->
     <h1>The Fall of the House of Vulkan</h1>
-    <h2 id="prologue">Prologue</h2>
 
-    <!-- INTRODUCTION -->
+    <!-- DATE -->
+    <p>xx/xx/2025</p>
+
+    <!-- PROLOGUE -->
+    <h2 id="prologue">Prologue</h2>
     <article>
     <p>
         <i>
@@ -472,7 +478,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
 
             CgVec4U8 color = cgConvertVec4F32ToU8(finalColor);
             uint32_t pixel = cgConvertVec4U8ToU32(color);
-            colorBuffer->pixels[j * colorBuffer->width + i] = pixel;
+            colorBuffer-&gtpixels[j * colorBuffer-&gtwidth + i] = pixel;
         }
     }
 }</code></pre>
@@ -565,11 +571,12 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     </p>
     <p>
         You need to understand interpolation <em>well</em>, because we will use it again, albeit for a different geometry.
+        Here is the <a href="../code/cursedgl/0.c" target="_blank">full source code</a> that draws the above image.
     </p>
     </article>
 
     <!-- FLOATING-POINT BUFFERS -->
-    <h2 id="floating-point-buffers" class="chapter merriweather-black">Floating-point Buffers</h2>
+    <h2 id="floating-point-buffers">Floating-point Buffers</h2>
     <article>
     <p>
         So far we have been storing our color values in <strong>CgColorBufferU32</strong>,
@@ -577,7 +584,171 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         with floating-point values. We have already seen this in the <strong>cgGradientColorBufferU32</strong>
         function. Linear interpolation works best with floating-point values as the <em>amount to interpolate</em> between two values
         is given by a real number between 0.0 and 1.0. In our case we could have simply defined a <strong>uint8_t</strong>
-        variant of the 
+        variant of the <strong>cgLerpVec4F32</strong> function, but there are reasons other than casting.
+        Many interesting computer graphics algorithms work best with floating-point buffers. One of them is <em>gamma correction</em>.
+    </p>
+    <p>
+        A problem that we are facing is that our colors are <em>wrong</em>. We talked about how the human eye is more sensitive
+        to certain colors more than others. Well, it turns out that our eyes become more sensitive to light in darker environments, too.
+        I don't exactly know why this is the case, but it could be an evolutionary adaptation to increase chances of survival
+        for our ancestors when they met their nocturnal enemies. Look at the image below that I yoinked from <a href="https://learnopengl.com" target="_blank">learnopengl.com</a>
+        (there will be a lot of yoinking in this article&#8212standing on the shoulders of giants or something):
+    </p>
+    <p>
+        <img alt="Perceived vs physical brightness" src="../img/gamma-correction.png">
+    </p>
+    <p>
+        Looking at the physical brightness values, they don't seem to be evenly-spaced, even though they are.
+        There is only a constant amount of difference between the colors of the boxes in the physical brightness row,
+        even though it doesn't look that way. In contrast, the difference between the colors of the boxes in the
+        perceived brightness row <em>varies</em>, and yet the difference seems constant to us.
+        Alas, our delusions triumph reality, and our hallucinations gain an upper hand.
+        To satisfy our false perceptions, we must map the physical brightness to perceived brightness, lest the colors will look wrong.
+        This mapping is done implicitly by our computers, using a power law relationship:
+    </p>
+    <p style="text-align: center;">
+        \( C_{gamma} = {C_{linear}}^{k} \) <span style="float: right;">(1)</span>
+    </p>
+    <p>
+        Here \(C_{linear} \) is the color that we generated using <strong>cgGradientColorBufferU32</strong>, but the actual color on the screen
+        will be \(C_{gamma} \). Think about it for a second. Because we used values between 0 and 255 to represent our color values,
+        you may conclude that \(C_{gamma} \) for a color value of 128 will be 16384 (assuming k is 2), but this is not the case.
+        (1) is defined for color values between 0.0 and 1.0, so a value of 128 will actually be 0.5; and when you compute 0.5 to the power of 2,
+        you get 0.25, a lower value! Therefore, the output of <strong>cgGradientColorBufferU32</strong> will look <em>dimmer</em>.
+    </p>
+    <p>
+        The solution is to apply <em>gamma correction</em>, which we can by simply applying the inverse of (1) to the output of <strong>cgGradientColorBufferU32</strong>:
+    </p>
+    <p style="text-align: center;">
+        \(C_{encoded} = {C_{linear}}^{1/k} \) <span style="float: right;">(2)</span>
+    </p>
+    <p>
+        Later, when \(C_{encoded} \) goes through (1), the powers cancel out, and we end up with the correct colors,
+        since for any value \( x \) we have \( ({{x}^{1/k}})^{k} = x^1 = x \).
+    </p>
+    <p>
+        Let's see how that looks in practice. First, we define a floating-point framebuffer:
+    </p>
+    <pre><code class="mono">typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    CgVec4F32* pixels;
+}
+CgColorBufferF32;</code></pre>
+    <p>
+        Then we write another function, <strong>cgCreateColorBufferF32</strong>, to allocate memory for our floating-point buffer:
+    </p>
+    <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
+                                        uint32_t height)
+{
+    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
+
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = malloc(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferF32");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}</code></pre>
+    <p>
+        We also write the floating-point variant of <strong>cgColorBufferU32ToPPM</strong>, except this time
+        we apply gamma correction to every pixel:
+    </p>
+    <pre><code class="mono">void cgColorBufferF32ToPPM(const CgColorBufferF32* restrict colorBuffer,
+                           const char* restrict path,
+                           float gamma)
+{
+    assert(colorBuffer && "cgColorBufferF32ToPPM: colorBuffer is NULL");
+    assert(path && "cgColorBufferF32ToPPM: path is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        perror("cgColorBufferF32ToPPM");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gtgtwidth, colorBuffer-&gtgtheight);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gtgtwidth * colorBuffer-&gtheight;
+    for (uint32_t i = 0; i < resolution; ++i) {
+        CgVec4F32 pixel = colorBuffer->pixels[i];
+        CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
+        uint8_t red = (uint8_t)(gammaEncodedPixel.x * 255.0f);
+        uint8_t green = (uint8_t)(gammaEncodedPixel.y * 255.0f);
+        uint8_t blue = (uint8_t)(gammaEncodedPixel.z * 255.0f);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}</code></pre>
+    <p>
+        Below is the definition of <strong>cgApplyGammaToVec4F32</strong>:
+    </p>
+    <pre><code class="mono">CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
+{
+    CgVec4F32 gammaEncodedPixel = {
+        .x = powf(pixel.x, 1.0f / gamma),
+        .y = powf(pixel.y, 1.0f / gamma),
+        .z = powf(pixel.z, 1.0f / gamma),
+        .w = pixel.w
+    };
+    return gammaEncodedPixel;
+}</code></pre>
+    <p>
+        The floating-point version of <strong>cgGradientColorBufferU32</strong> is:
+    </p>
+    <pre><code class="mono">void cgGradientColorBufferF32(CgColorBufferF32* restrict colorBuffer,
+                              CgVec4F32 topLeftColor,
+                              CgVec4F32 topRightColor,
+                              CgVec4F32 bottomLeftColor,
+                              CgVec4F32 bottomRightColor)
+{
+    assert(colorBuffer && "cgGradientColorBufferU32: colorBuffer is NULL");
+
+    for (uint32_t i = 0; i &lt colorBuffer-&gtwidth; ++i) {
+        float x = (float)i / (float)colorBuffer-&gtwidth;
+        for (uint32_t j = 0; j &lt colorBuffer-&gtheight; ++j) {
+            float y = (float)j / (float)colorBuffer-&gtheight;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColor, topRightColor, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            colorBuffer->pixels[j * colorBuffer-&gtwidth + i] = finalColor;
+        }
+    }
+}</code></pre>
+    <p>
+        The question is, what value should we use for <em>gamma</em>? Monitors often use 2.2,
+        but I decided to make it a tweakable parameter so that the user can change it. If we use a gamma value
+        of 2.2, then the linearly interpolated image that we had generated previously will look like this:
+    </p>
+    <p>
+        <img alt="Gamma-corrected output" src="../img/cursedgl_2.png">
+    </p>
+    <p>
+        Compare it with the previous image. Note how the colors are much brighter. Your monitor may use
+        a different value for gamma, in which case you may need to adjust it further.
+        Here is the full <a href="../code/cursedgl/1.c" target="_blank">source code</a> (don't forget to link the math library).
+        Notice how <strong>cgGradientColorBufferF32</strong> is <em>simpler</em>
+        than its <strong>U32</strong> variant.
+        We no longer need any conversions, the only conversion needed is in <strong>cgColorBufferF32ToPPM</strong>.
+        From this point on, we will use floating-point buffers.
+    </p>
+    <p>
+        I touched only briefly on <em>gamma correction</em>, but there is more to it. You may want to read this
+        <a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma" target="_blank">excellent article</a>
+        by John Novak, who delves much deeper into the topic, and also shows what happens when your gamma values are incorrect.
+    </p>
+    </article>
+
+    <h2 id="memory">Memory</h2>
+    <article>
+    <p>
+
     </p>
     </article>
 </body>
