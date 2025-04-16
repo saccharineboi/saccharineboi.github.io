@@ -3,17 +3,52 @@ body {
     margin: 0 auto;
     font-family: Garamond, serif;
     padding: 50px;
+    font-size: 12pt;
 }
 
 pre {
     overflow-x: auto;
+    font-size: 1em;
 }
 
 a {
     color: darkblue;
 }
 
+h1 {
+    font-size: 3em;
+}
+
+h2 {
+    font-size: 2em;
+}
+
+p {
+    font-size: 1.5em;
+}
+
+li {
+    font-size: 1.5em;
+}
+
 a:hover {
     color: darkgreen;
 }
 
+@media only screen and (max-width: 800px) {
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+    p {
+        font-size: 1em;
+    }
+    li {
+        font-size: 1em;
+    }
+    pre {
+        font-size: 1em;
+    }
+}

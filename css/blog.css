@@ -2,7 +2,12 @@ body {
     max-width: 800px;
     margin: 0 auto;
     font-family: Garamond, serif;
+    font-size: 12pt;
     padding: 50px;
+}
+
+article {
+    font-size: 1.5em;
 }
 
 pre {
@@ -22,7 +27,12 @@ img {
 }
 
 h1 {
+    font-size: 3em;
     text-transform: uppercase;
+}
+
+h2 {
+    font-size: 2em;
 }
 
 table {
@@ -48,4 +58,16 @@ td {
 .home-btn a {
     color: white;
     text-decoration: none;
+}
+
+@media only screen and (max-width: 800px) {
+    article {
+        font-size: 1em;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
 }
