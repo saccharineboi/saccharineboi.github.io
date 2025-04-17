@@ -34,20 +34,48 @@ typedef struct
 }
 CgColorBufferF32;
 
+typedef struct
+{
+    void* (*alloc_mem)(size_t);
+    void (*free_mem)(void*);
+}
+CgMemoryAllocator;
+
+CgMemoryAllocator* cgGetDefaultAllocator()
+{
+    static CgMemoryAllocator allocator = {
+        .alloc_mem = malloc,
+        .free_mem = free
+    };
+    return &allocator;
+}
+
 CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
-                                        uint32_t height)
+                                        uint32_t height,
+                                        CgMemoryAllocator* allocator)
 {
     assert(width > 0 && height > 0 && "cgCreateColorBufferF32: width or height is zero");
+    assert(allocator && "cgCreateColorBufferF32: allocator is NULL");
 
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = malloc(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = allocator->alloc_mem(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
         perror("cgCreateColorBufferF32");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
+}
+
+void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
+                             CgMemoryAllocator* allocator)
+{
+    assert(buffer && "cgDestroyColorBufferF32: buffer is NULL");
+    assert(allocator && "cgDestroyColorBufferF32: allocator is NULL");
+
+    allocator->free_mem(buffer->pixels);
+    buffer->width = buffer->height = 0;
 }
 
 void cgGradientColorBufferF32(CgColorBufferF32* restrict colorBuffer,
@@ -115,12 +143,13 @@ int main()
     uint32_t width = 320;
     uint32_t height = 240;
     float gamma = 2.2f;
-    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height);
+    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height, cgGetDefaultAllocator());
     CgVec4F32 topLeftColor = { 1.0f, 0.0f, 0.0f, 1.0f };
     CgVec4F32 topRightColor = { 0.0f, 1.0f, 0.0f, 1.0f };
     CgVec4F32 bottomLeftColor = { 0.0f, 0.0f, 1.0f, 1.0f };
     CgVec4F32 bottomRightColor = { 1.0f, 1.0f, 0.0f, 1.0f };
     cgGradientColorBufferF32(&colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
     cgColorBufferF32ToPPM(&colorBuffer, "sample.ppm", gamma);
+    cgDestroyColorBufferF32(&colorBuffer, cgGetDefaultAllocator());
     return 0;
 }

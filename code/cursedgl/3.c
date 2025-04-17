@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdarg.h>
+#include <time.h>
 
 typedef struct
 {
@@ -34,20 +36,73 @@ typedef struct
 }
 CgColorBufferF32;
 
+typedef struct
+{
+    void* (*alloc_mem)(size_t);
+    void (*free_mem)(void*);
+}
+CgMemoryAllocator;
+
+CgMemoryAllocator* cgGetDefaultAllocator()
+{
+    static CgMemoryAllocator allocator = {
+        .alloc_mem = malloc,
+        .free_mem = free
+    };
+    return &allocator;
+}
+
+#define CG_LOG_MAX 500
+
+__attribute__((format(printf, 1, 2)))
+void CgDefaultErrorCallback(const char* args, ...)
+{
+    va_list ap;
+    va_start(ap, args);
+    char output[CG_LOG_MAX];
+    vsnprintf(output, CG_LOG_MAX, args, ap);
+    va_end(ap);
+    printf("[CgDefaultErrorCallback]: %s\n", output);
+    exit(EXIT_FAILURE);
+}
+
+typedef void (*CgErrorCallback)(const char*, ...);
+
+typedef struct
+{
+    CgMemoryAllocator* allocator;
+    CgErrorCallback callback;
+}
+CgApplication;
+
 CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
-                                        uint32_t height)
+                                        uint32_t height,
+                                        CgApplication* application)
 {
     assert(width > 0 && height > 0 && "cgCreateColorBufferF32: width or height is zero");
+    assert(application && "cgCreateColorBufferF32: application is NULL");
+    assert(application->allocator && "cgCreateColorBufferF32: allocator is NULL");
+    assert(application->callback && "cgCreateColorBufferF32: callback is NULL");
 
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = malloc(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = application->allocator->alloc_mem(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferF32");
-        exit(EXIT_FAILURE);
+        application->callback("cgCreateColorBufferF32: memory allocation failed");
     }
     return colorBuffer;
+}
+
+void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
+                             CgApplication* application)
+{
+    assert(buffer && "cgDestroyColorBufferF32: buffer is NULL");
+    assert(application && "cgDestroyColorBufferF32: application is NULL");
+    assert(application->allocator && "cgDestroyColorBufferF32: allocator is NULL");
+
+    application->allocator->free_mem(buffer->pixels);
+    buffer->width = buffer->height = 0;
 }
 
 void cgGradientColorBufferF32(CgColorBufferF32* restrict colorBuffer,
@@ -85,15 +140,17 @@ CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
 
 void cgColorBufferF32ToPPM(const CgColorBufferF32* restrict colorBuffer,
                            const char* restrict path,
-                           float gamma)
+                           float gamma,
+                           CgApplication* application)
 {
     assert(colorBuffer && "cgColorBufferF32ToPPM: colorBuffer is NULL");
     assert(path && "cgColorBufferF32ToPPM: path is NULL");
+    assert(application && "cgColorBufferF32ToPPM: application is NULL");
+    assert(application->callback && "cgColorBufferF32ToPPM: callback is NULL");
 
     FILE* fp = fopen(path, "w");
     if (!fp) {
-        perror("cgColorBufferF32ToPPM");
-        exit(EXIT_FAILURE);
+        application->callback("cgColorBufferF32ToPPM: couldn't open file '%s'\n", path);
     }
     fprintf(fp, "P3\n");
     fprintf(fp, "%u %u\n", colorBuffer->width, colorBuffer->height);
@@ -115,12 +172,19 @@ int main()
     uint32_t width = 320;
     uint32_t height = 240;
     float gamma = 2.2f;
-    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height);
+
+    CgApplication application = {
+        .allocator = cgGetDefaultAllocator(),
+        .callback = CgDefaultErrorCallback
+    };
+
+    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height, &application);
     CgVec4F32 topLeftColor = { 1.0f, 0.0f, 0.0f, 1.0f };
     CgVec4F32 topRightColor = { 0.0f, 1.0f, 0.0f, 1.0f };
     CgVec4F32 bottomLeftColor = { 0.0f, 0.0f, 1.0f, 1.0f };
     CgVec4F32 bottomRightColor = { 1.0f, 1.0f, 0.0f, 1.0f };
     cgGradientColorBufferF32(&colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
-    cgColorBufferF32ToPPM(&colorBuffer, "sample.ppm", gamma);
+    cgColorBufferF32ToPPM(&colorBuffer, "sample.ppm", gamma, &application);
+    cgDestroyColorBufferF32(&colorBuffer, &application);
     return 0;
 }

@@ -585,10 +585,10 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         function. Linear interpolation works best with floating-point values as the <em>amount to interpolate</em> between two values
         is given by a real number between 0.0 and 1.0. In our case we could have simply defined a <strong>uint8_t</strong>
         variant of the <strong>cgLerpVec4F32</strong> function, but there are reasons other than casting.
-        Many interesting computer graphics algorithms work best with floating-point buffers. One of them is <em>gamma correction</em>.
+        Many interesting computer graphics algorithms work best with floating-point numbers. One of them is <em>gamma correction</em>.
     </p>
     <p>
-        A problem that we are facing is that our colors are <em>wrong</em>. We talked about how the human eye is more sensitive
+        A problem that we are facing now is that our colors are <em>wrong</em>. We talked about how the human eye is more sensitive
         to certain colors more than others. Well, it turns out that our eyes become more sensitive to light in darker environments, too.
         I don't exactly know why this is the case, but it could be an evolutionary adaptation to increase chances of survival
         for our ancestors when they met their nocturnal enemies. Look at the image below that I yoinked from <a href="https://learnopengl.com" target="_blank">learnopengl.com</a>
@@ -627,7 +627,12 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         since for any value \( x \) we have \( ({{x}^{1/k}})^{k} = x^1 = x \).
     </p>
     <p>
-        Let's see how that looks in practice. First, we define a floating-point framebuffer:
+        Unfortunately, <strong>cgGradientColorBufferU32</strong> produces <strong>uint32_t</strong> colors between 0 and 255,
+        but (2) assumes that \(C_{linear} \) is a floating-point value between 0.0 and 1.0.
+        Instead of using a <strong>uint32_t</strong> value between 0 and 255, we will
+        represent the components (i.e. <span style="color: red;">red</span>, <span style="color: green;">green</span>, <span style="color: blue;">blue</span>)
+        of our colors as floating-point values between 0.0 and 1.0. Let's see how that looks in practice. First, we define
+        a floating-point variant of <strong>CgColorBufferU32</strong>:
     </p>
     <pre><code class="mono">typedef struct
 {
@@ -671,9 +676,9 @@ CgColorBufferF32;</code></pre>
         exit(EXIT_FAILURE);
     }
     fprintf(fp, "P3\n");
-    fprintf(fp, "%u %u\n", colorBuffer-&gtgtwidth, colorBuffer-&gtgtheight);
+    fprintf(fp, "%u %u\n", colorBuffer-&gtwidth, colorBuffer-&gtheight);
     fprintf(fp, "255\n");
-    uint32_t resolution = colorBuffer-&gtgtwidth * colorBuffer-&gtheight;
+    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
     for (uint32_t i = 0; i < resolution; ++i) {
         CgVec4F32 pixel = colorBuffer->pixels[i];
         CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
@@ -717,10 +722,15 @@ CgColorBufferF32;</code></pre>
             CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
             CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
 
-            colorBuffer->pixels[j * colorBuffer-&gtwidth + i] = finalColor;
+            colorBuffer-&gtpixels[j * colorBuffer-&gtwidth + i] = finalColor;
         }
     }
 }</code></pre>
+    <p>
+        Here is the full <a href="../code/cursedgl/1.c" target="_blank">source code</a> (don't forget to link the math library).
+        Notice how <strong>cgGradientColorBufferF32</strong> is <em>simpler</em> than its <strong>U32</strong> variant,
+        mainly because we no longer need <strong>uint32_t</strong> -&gt <strong>float</strong> conversions like before.
+    </p>
     <p>
         The question is, what value should we use for <em>gamma</em>? Monitors often use 2.2,
         but I decided to make it a tweakable parameter so that the user can change it. If we use a gamma value
@@ -732,11 +742,6 @@ CgColorBufferF32;</code></pre>
     <p>
         Compare it with the previous image. Note how the colors are much brighter. Your monitor may use
         a different value for gamma, in which case you may need to adjust it further.
-        Here is the full <a href="../code/cursedgl/1.c" target="_blank">source code</a> (don't forget to link the math library).
-        Notice how <strong>cgGradientColorBufferF32</strong> is <em>simpler</em>
-        than its <strong>U32</strong> variant.
-        We no longer need any conversions, the only conversion needed is in <strong>cgColorBufferF32ToPPM</strong>.
-        From this point on, we will use floating-point buffers.
     </p>
     <p>
         I touched only briefly on <em>gamma correction</em>, but there is more to it. You may want to read this
@@ -748,8 +753,169 @@ CgColorBufferF32;</code></pre>
     <h2 id="memory">Memory</h2>
     <article>
     <p>
+        So far in our application we used the standard library routine <strong>malloc</strong> for our memory allocations.
+        While there isn't anything inherently wrong with <strong>malloc</strong>, it's more judicious to allow the programmer
+        choose her own memory allocation routine. And in case she doesn't, we can easily revert back to <strong>malloc</strong>.
+    </p>
+    <p>
+        Another issue with our code is that we don't release the memory that we had allocated once the application exits.
+        This wasn't really an issue before since your operating system has no problem cleaning all that mess,
+        but it's a good habit to make sure that our application cleans after itself at the end of its lifecycle.
+    </p>
+    <p>
+        We can solve the first problem by creating a new structure to store allocation/de-allocation routines:
+    </p>
+    <pre><code class="mono">typedef struct
+{
+    void* (*alloc_mem)(size_t);
+    void (*free_mem)(void*);
+}
+CgMemoryAllocator;</code></pre>
+    <p>
+        Then we modify the <strong>cgCreateColorBufferF32</strong> function so that it accepts these custom-defined memory allocation routines:
+    </p>
+    <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
+                                        uint32_t height,
+                                        CgMemoryAllocator* allocator)
+{
+    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
+    assert(allocator && "cgCreateColorBufferF32: allocator is NULL");
 
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = allocator->alloc_mem(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferF32");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}</code></pre>
+    <p>
+        It may be the case that the programmer has no problem using the default allocation routines like the <strong>malloc</strong> function,
+        so we define another function <strong>cgGetDefaultAllocator</strong>, that returns those routines:
+    </p>
+    <pre><code class="mono">CgMemoryAllocator* cgGetDefaultAllocator()
+{
+    static CgMemoryAllocator allocator = {
+        .alloc_mem = malloc,
+        .free_mem = free
+    };
+    return &allocator;
+}</code></pre>
+    <p>
+        To solve the second problem, we define another function, called <strong>cgDestroyColorBufferF32</strong>,
+        that the programmer can use to release the memory allocated for the color buffer:
+    </p>
+    <pre><code class="mono">void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
+                             CgMemoryAllocator* allocator)
+{
+    assert(buffer && "cgDestroyColorBufferF32: buffer is NULL");
+    assert(allocator && "cgDestroyColorBufferF32: allocator is NULL");
+
+    allocator-&gtfree_mem(buffer-&gtpixels);
+    buffer-&gtwidth = buffer-&gtheight = 0;
+}</code></pre>
+    <p>
+        In the future we will define our own custom memory allocation functions, and <strong>CgMemoryAllocator</strong>
+        will prove more useful than it seems now. See the full <a href="../code/cursedgl/2.c" target="_blank">source code</a>.
     </p>
     </article>
+    <h2 id="error-handling">Error Handling</h2>
+    <article>
+    <p>
+        So far we have followed the pattern of giving the programmer as much control as possible over the application, except when it comes to handling of errors.
+        For example, when <strong>cgCreateColorBufferF32</strong> fails to allocate memory, it simply outputs a message by calling <strong>perror</strong> and then exits.
+        But what if the programmer is interested in <em>logging</em> the message, or maybe she doesn't appreciate the application shutting down, and instead would
+        rather write her own logic for failure cases like this? <strong>cgColorBufferF32ToPPM</strong> is another culprit:
+        it will also shut down the application if it fails to open a file descriptor.
+    </p>
+    <p>
+        We can defer the logic of error-handling to the programmer similar to how we deferred memory allocations.
+        Namely, we will allow the programmer to pass her own logic to those functions where some error <em>may</em> occur,
+        but also provide a default error-handling routine in case the programmer is fine with the default behavior.
+    </p>
+    <p>
+        Our solution is to supply a type definition for an error-callback function:
+    </p>
+    <pre><code class="mono">#define CG_LOG_MAX 500
+
+__attribute__((format(printf, 1, 2)))
+void CgDefaultErrorCallback(const char* args, ...)
+{
+    va_list ap;
+    va_start(ap, args);
+    char output[CG_LOG_MAX];
+    vsnprintf(output, CG_LOG_MAX, args, ap);
+    va_end(ap);
+    printf("[CgDefaultErrorCallback]: %s\n", output);
+}
+
+typedef void (*CgErrorCallback)(const char*, ...);</code></pre>
+    <p>
+        The <strong>...</strong> indicates that the function accepts a variable number of arguments. This is so that the programmer can construct her own
+        format strings, which can be useful. The <strong>__attribute__</strong> serves to inform the compiler that the <strong>args</strong> argument
+        is <em>supposed</em> to be a printf-style format string, otherwise it will complain (assuming that you have enabled the warnings).
+    </p>
+    <p>
+        There are two problems here. First, <strong>__attribute__</strong> is just a <em>hint</em> to the compiler that <strong>args</strong> is
+        a printf-style format string. But there is nothing preventing the programmer from passing invalid strings to <strong>CgErrorCallback</strong>.
+        There is a good reason why the compiler is complaining here. Passing the wrong type of string to formatting functions enables a whole class of
+        <a href="https://owasp.org/www-community/attacks/Format_string_attack" target="_blank">security issues</a>.
+        Here we assume that the programmer can control where these strings come from, but if she does something stupid like passing unsanitized user input
+        to <strong>CgErrorCallback</strong>, there really isn't that much that we can do.
+    </p>
+    <p>
+        The second problem is that <strong>__attribute__</strong> is a <em>compiler-specific</em> hint.
+        It works for <a href="https://gcc.gnu.org/" target="_blank">GCC</a>, but it may not work for you if you use a different compiler
+        (your compiler may not even generate a warning). See the documentation of your compiler to see your options. In this article,
+        I will assume that you are using GCC.
+    </p>
+    <p>
+        Instead of passing two arguments (one for memory allocation, another for error-handling) we package both in a single structure:
+    </p>
+    <pre><code class="mono">typedef struct
+{
+    CgMemoryAllocator* allocator;
+    CgErrorCallback callback;
+}
+CgApplication;</code></pre>
+    <p>
+        Now we modify our functions so that they accept <strong>CgApplication</strong> instead. For example, <strong>cgCreateColorBufferF32</strong> becomes:
+    </p>
+    <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
+                                        uint32_t height,
+                                        CgApplication* application)
+{
+    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
+    assert(application && "cgCreateColorBufferF32: application is NULL");
+    assert(application-&gtallocator && "cgCreateColorBufferF32: allocator is NULL");
+    assert(application-&gtcallback && "cgCreateColorBufferF32: callback is NULL");
+
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = application-&gtallocator-&gtalloc_mem(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        application-&gtcallback("cgCreateColorBufferF32: memory allocation failed");
+    }
+    return colorBuffer;
+}</code></pre>
+    <p>
+        The programmer essentially initializes a <strong>CgApplication</strong> object in the beginning of the application, and passes it to
+        functions where it's needed:
+    </p>
+    <pre><code class="mono">CgApplication application = {
+    .allocator = cgGetDefaultAllocator(),
+    .callback = CgDefaultErrorCallback
+};</code></pre>
+    <p>
+        See the <a href="../code/cursedgl/3.c" target="_blank">source code</a> for changes in other functions.
+    </p>
+    </article>
+
+    <!-- POINTS -->
+    <h2 id="points">In the beginning, there was a point</h2>
+    <article>
 </body>
 </html>
