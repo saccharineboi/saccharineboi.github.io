@@ -79,13 +79,13 @@ CgColorBufferU32 cgCreateColorBufferU32(uint32_t width,
     colorBuffer.height = height;
     colorBuffer.pixels = malloc(width * height * sizeof(uint32_t));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferU32");
+        perror("cgCreateColorBufferU32::malloc:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
 }
 
-void cgClearColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+void cgClearColorBufferU32(CgColorBufferU32* colorBuffer,
                            CgVec4U8 color)
 {
     assert(colorBuffer && "cgClearColorBufferU32: colorBuffer is NULL");
@@ -97,7 +97,7 @@ void cgClearColorBufferU32(CgColorBufferU32* restrict colorBuffer,
     }
 }
 
-void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+void cgGradientColorBufferU32(CgColorBufferU32* colorBuffer,
                               CgVec4U8 topLeftColor,
                               CgVec4U8 topRightColor,
                               CgVec4U8 bottomLeftColor,
@@ -126,15 +126,15 @@ void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
     }
 }
 
-void cgColorBufferU32ToPPM(const CgColorBufferU32* restrict colorBuffer,
-                           const char* restrict path)
+void cgColorBufferU32ToPPM(const CgColorBufferU32* colorBuffer,
+                           const char* path)
 {
     assert(colorBuffer && "cgColorBufferU32ToPPM: colorBuffer is NULL");
     assert(path && "cgColorBufferU32ToPPM: path is NULL");
 
     FILE* fp = fopen(path, "w");
     if (!fp) {
-        perror("cgColorBufferU32ToPPM");
+        perror("cgColorBufferU32ToPPM::fopen:");
         exit(EXIT_FAILURE);
     }
     fprintf(fp, "P3\n");

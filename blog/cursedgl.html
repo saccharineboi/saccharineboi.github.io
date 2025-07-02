@@ -16,11 +16,12 @@
     <link rel="manifest" href="../favico/site.webmanifest" />
 
     <!-- code highlighting stuff -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/vs.min.css" integrity="sha512-AVoZ71dJLtHRlsgWwujPT1hk2zxtFWsPlpTPCc/1g0WgpbmlzkqlDFduAvnOV4JJWKUquPc1ZyMc5eq4fRnKOQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/vs2015.min.css" integrity="sha512-mtXspRdOWHCYp+f4c7CkWGYPPRAhq9X+xCvJMUBVAb6pqA4U8pxhT3RWT3LP3bKbiolYL2CkL1bSKZZO4eeTew==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js" integrity="sha512-6yoqbrcLAHDWAdQmiRlHG4+m0g/CT/V9AGyxabG8j7Jk8j3r3K6due7oqpiRMZqcYe9WM2gPcaNNxnl2ux+3tA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/c.min.js" integrity="sha512-Ny9z3+WJkmC2xW098BNYhPajzsf8iBika/+58Mh4lHCF/it92UR32xhytP4I/yxKmF1fkcEgIF87qbGyz1nmDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>hljs.highlightAll();</script>
     
+    <!-- custom styling -->
     <link rel="stylesheet" href="../css/blog.css">
 
     <!-- For equations -->
@@ -29,9 +30,18 @@
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c4b2320f0ee04848bb6f51954d84c0d8"}'></script>
     <!-- End Cloudflare Web Analytics -->
+
+    <!-- Reading progress -->
+    <script defer src="../js/progressBar.js"></script>
 </head>
 <body>
-    <span class="home-btn"><a href="/">Go back to home page</a></span>
+    <!-- PROGRESS BAR -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- SIMPLE NAV -->
+    <span class="home-btn"><a href="/">Home Page</a></span>
 
     <!-- TITLE -->
     <h1>The Fall of the House of Vulkan</h1>
@@ -83,13 +93,16 @@
         No, I'm here to tell you something more important:
     </p>
     <p>
-        You have been scammed.
+        <em>You have been scammed.</em>
     </p>
     <p>
         A trillion-dollar industry has convinced you that you need to pay <a href="https://www.amazon.com/s?k=rtx+4090" target="_blank">thousands of dollars</a> to create your own simulacra.
     </p>
     <p>
         And that you also need to write a <a href="https://github.com/SaschaWillems/Vulkan/blob/master/examples/triangle/triangle.cpp" target="_blank">thousand lines</a> of code just to see a single triangle.
+    </p>
+    <p>
+        <a href="https://www.reddit.com/r/GraphicsProgramming/comments/103lrc9/they_took_us_for_absolute_fools/" target="_blank"><img alt="Stop doing graphics programming" src="../img/stop_doing_graphics.png"></a>
     </p>
     <p>
         I am here to tell you that there's another way. That you can do all that by yourself.
@@ -101,7 +114,7 @@
         So bring up your terminal, open your favorite text editor, and let's make our own simulator.
         You may use an <a href="https://www.learncpp.com/cpp-tutorial/installing-an-integrated-development-environment-ide/" target="_blank">IDE</a> if you wish.
         I am not here to teach you all the technicalities involved
-        in compiling and linking the source code, you will have to learn that <a href="https://www.learncpp.com/cpp-tutorial/compiling-your-first-program/" target="_blank">somewhere else</a>.
+        in compiling and linking the source code&mdash;you will have to learn that <a href="https://www.learncpp.com/cpp-tutorial/compiling-your-first-program/" target="_blank">somewhere else</a>.
         Nor will I teach you how to program in <a href="https://a.co/d/8qRAAeX" target="_blank">C</a>.
         But I <em>will</em> teach you the computer science behind generating images like the teapot above.
         No GPUs or <a href="https://registry.khronos.org/vulkan/specs/latest/html/vkspec.html" target="_blank">convoluted APIs</a> are needed. There is a great joy in writing your own computer graphics code from scratch,
@@ -115,8 +128,7 @@
     <p>
         What is the first step in creating our own <a href="https://en.wikipedia.org/wiki/The_Matrix" target="_blank">matrix</a>?
         We don't just want to build a general-purpose simulation, we want to <em>experience it</em>, too.
-        That means we need some sort of a portal into another dimension -
-        a <a href="https://narnia.fandom.com/wiki/Wardrobe" target="_blank">wardrobe</a> that opens to Narnia.
+        That means we need some sort of a portal into another dimension&mdash;a <a href="https://narnia.fandom.com/wiki/Wardrobe" target="_blank">wardrobe</a> that opens to Narnia.
         There are different ways of accomplishing this. One of them is by creating an image, and then displaying it on an image viewer.
         But there are <a href="https://en.wikipedia.org/wiki/Image_file_format#Major_graphic_file_formats" target="_blank">so many</a> image formats, which one to choose?
     </p>
@@ -169,14 +181,13 @@
     <p>
         <strong>P3</strong> denotes that this is an <a href="https://en.wikipedia.org/wiki/ASCII" target="_blank">ASCII</a> file.
         <strong>3</strong> and <strong>2</strong> are the width and the height of the image, respectively.
-        <strong>255</strong> on the next line means <em>"end of header"</em>. That is, everything that comes after this line are the actual colors of the image,
-        which we discuss next.
+        <strong>255</strong> on the next line means <em>"end of header"</em>. That is, everything that comes after this line are the actual colors of the image&mdash;which we discuss next.
     </p>
     <p>
         What <i>is</i> <strong>color</strong>? This may shock you when I say this, but, colors aren't <em>real</em>. They don't actually exist.
         Colors are no more real than the Santa Claus who gifts you presents (or coal!) every Christmas.
         We all partake in a great conspiracy when we open our eyes and <em>see</em>. Colors form an important part of our shared hallucination of the world,
-        alongside money and religion. It's funny when you think about it: the teapot that you saw earlier is a lie that approximates another lie
+        alongside money and religion. It's funny when you think about it: the teapot that you "saw" earlier is a lie that approximates another lie
         concocted by the buzzing of neurons inside your <a href="https://en.wikipedia.org/wiki/Visual_cortex" target="_blank">visual cortex</a>.
     </p>
     <p>
@@ -195,8 +206,7 @@
         <img alt="Human color sensitivities" src="../img/eye-color-sensitivity.webp">
     </p>
     <p>
-        The human eye is more sensitive to some colors than others.
-        You may see some colors <em>"brighter"</em> than others (assuming that you're a human reading this page).
+        The human eye is more sensitive to some colors than others, i.e. you may see some colors <em>"brighter"</em> than others (assuming that you're a human reading this page).
         Also, due to the awkward wiring of the optical nerve, you have been gifted a blind spot:
     </p>
     <p>
@@ -204,16 +214,19 @@
     </p>
     <p>
         <i>"But... I don't see any dark patches in my vision?!"</i>, you might say.
-        Well, thanks to this oopsie made by the clunky hand of evolution,
-        your brain now has to compensate for this by literally <a href="https://en.wikipedia.org/wiki/Blind_spot_(vision)" target="_blank">filling in</a> the void.
+        Well, thanks to this error made by the clunky hand of evolution,
+        your brain now has to compensate by literally <a href="https://en.wikipedia.org/wiki/Blind_spot_(vision)" target="_blank">filling in</a> the void.
         Life decided that it would rather hallucinate than to actually see.
     </p>
     <p>
-        You live your life in your very own <a href="https://en.wikipedia.org/wiki/Metaverse" target="_blank">Metaverse</a>,
+        You live inside your very own <a href="https://en.wikipedia.org/wiki/Metaverse" target="_blank">Metaverse</a>,
         powered by the three pounds of flesh in your skull.
     </p>
     <p>
         By the way, cephalopods <a href="https://youtu.be/HATW8xJMxAc?si=E_YykDNmXw-hIPkN" target="_blank">don't have this problem</a>.
+    </p>
+    <p>
+        Christians were right all along&mdash;we really <em>are</em> made in the image of our <a href="https://en.wikipedia.org/wiki/The_Blind_Watchmaker" target="_blank">Creator</a>.
     </p>
     <p>
         What I want you to get from all this is that everything that you see is fake: you are fake, I am fake, your Mom is fake...
@@ -227,11 +240,11 @@
         There are philosophers who think the simulation is <a href="https://simulation-argument.com/" target="_blank">the final technology</a>.
     </p>
     <p>
-        That being said, the chicanery of light and color is often too complex for computers to handle
+        That being said, the chicanery of light and color is too complex for computers to handle
         (especially when we want to generate images <em>fast</em>).
         Instead what we do is take the visible part of the electromagnetic spectrum and quantize it based on the intensity of three colors:
-        <span style="color: red;">RED</span>, <span style="color: green;">GREEN</span>, and <span style="color: blue;">BLUE</span>,
-        to the much chagrin of <a href="https://en.wikipedia.org/wiki/Tetrachromacy" target="_blank">tetrachromats</a>.
+        <span style="color: red;">RED</span>, <span style="color: green;">GREEN</span>, and <span style="color: blue;">BLUE</span>&mdash;to
+        the much chagrin of <a href="https://en.wikipedia.org/wiki/Tetrachromacy" target="_blank">tetrachromats</a>.
         We represent each of these intensities as an 8-bit unsigned integer between 0 and 255.
         This gives us a total of 256 * 256 * 256 = 16777216 (~16 million) colors to work with. Not bad.
     </p>
@@ -262,7 +275,7 @@
     </p>
     <p>
         This is the <span style="color: green;">GREEN</span> color.
-        When we <em>interpret</em> the color information together with the width and the height of the image, we get the following picture:
+        When we <em>interpret</em> the color data together with the width and the height of the image, we get the following picture:
     </p>
     <p>
         <img alt="PPM image example" src="../img/ppm.svg">
@@ -271,10 +284,12 @@
         We now know that to generate images we will need a structure that stores width, height, and an array of numbers that represents the colors.
         So, let us do that:
     </p>
-    <pre><code class="mono">#include &ltstdio.h&gt
-#include &ltstdint.h&gt
-#include &ltstdlib.h&gt
-#include &ltassert.h&gt
+    <details>
+        <summary>Click to see the code</summary>
+    <pre><code class="mono">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
 
 typedef struct
 {
@@ -296,55 +311,55 @@ CgColorBufferU32;
 CgColorBufferU32 cgCreateColorBufferU32(uint32_t width,
                                         uint32_t height)
 {
-    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferU32: width or height is zero");
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferU32: width or height is zero");
 
     CgColorBufferU32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
     colorBuffer.pixels = malloc(width * height * sizeof(uint32_t));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferU32");
+        perror("cgCreateColorBufferU32::malloc:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
 }
 
-void cgClearColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+void cgClearColorBufferU32(CgColorBufferU32* colorBuffer,
                            CgVec4U8 color)
 {
-    assert(colorBuffer && "cgClearColorBufferU32: colorBuffer is NULL");
+    assert(colorBuffer &amp;&amp; "cgClearColorBufferU32: colorBuffer is NULL");
 
     uint32_t pixel = ((uint32_t)color.x) |
-                     ((uint32_t)color.y &lt&lt 8) |
-                     ((uint32_t)color.z &lt&lt 16) |
-                     ((uint32_t)color.w &lt&lt 24);
+                     ((uint32_t)color.y &lt;&lt; 8) |
+                     ((uint32_t)color.z &lt;&lt; 16) |
+                     ((uint32_t)color.w &lt;&lt; 24);
 
-    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
-    for (uint32_t i = 0; i &lt resolution; ++i) {
-        colorBuffer-&gtpixels[i] = pixel;
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        colorBuffer-&gt;pixels[i] = pixel;
     }
 }
 
-void cgColorBufferU32ToPPM(const CgColorBufferU32* restrict colorBuffer,
-                           const char* restrict path)
+void cgColorBufferU32ToPPM(const CgColorBufferU32* colorBuffer,
+                           const char* path)
 {
-    assert(colorBuffer && "cgColorBufferU32ToPPM: colorBuffer is NULL");
-    assert(path && "cgColorBufferU32ToPPM: path is NULL");
+    assert(colorBuffer &amp;&amp; "cgColorBufferU32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferU32ToPPM: path is NULL");
 
     FILE* fp = fopen(path, "w");
     if (!fp) {
-        perror("cgColorBufferU32ToPPM");
+        perror("cgColorBufferU32ToPPM::fopen:");
         exit(EXIT_FAILURE);
     }
     fprintf(fp, "P3\n");
-    fprintf(fp, "%u %u\n", colorBuffer-&gtwidth, colorBuffer-&gtheight);
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
     fprintf(fp, "255\n");
-    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
-    for (uint32_t i = 0; i &lt resolution; ++i) {
-        uint32_t pixel = colorBuffer-&gtpixels[i];
-        uint8_t red = *((uint8_t*)&pixel + 0);
-        uint8_t green = *((uint8_t*)&pixel + 1);
-        uint8_t blue = *((uint8_t*)&pixel + 2);
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        uint32_t pixel = colorBuffer-&gt;pixels[i];
+        uint8_t red = *((uint8_t*)&amp;pixel + 0);
+        uint8_t green = *((uint8_t*)&amp;pixel + 1);
+        uint8_t blue = *((uint8_t*)&amp;pixel + 2);
         fprintf(fp, "%u %u %u\n", red, green, blue);
     }
     fclose(fp);
@@ -356,10 +371,11 @@ int main()
     uint32_t height = 240;
     CgVec4U8 clearColor = { 255, 150, 255, 255 };
     CgColorBufferU32 colorBuffer = cgCreateColorBufferU32(width, height);
-    cgClearColorBufferU32(&colorBuffer, clearColor);
-    cgColorBufferU32ToPPM(&colorBuffer, "sample.ppm");
+    cgClearColorBufferU32(&amp;colorBuffer, clearColor);
+    cgColorBufferU32ToPPM(&amp;colorBuffer, "sample.ppm");
     return 0;
 }</code></pre>
+    </details>
     <p>
         Running the code above creates the image below:
     </p>
@@ -413,22 +429,22 @@ CgVec4F32;</code></pre>
 }
 CgColorBufferU32;</code></pre>
     <p>
-        Each pixel is defined as an unsigned 32-bit integer (8-bit per channel, with an alpha value that we will discuss later).
+        Each pixel is defined as an unsigned 32-bit integer (8-bit per channel, with an additional 8-bit alpha channel that we will discuss later).
     </p>
     <p>
         Then we define the <strong>cgCreateColorBufferU32</strong> function that allocates a new buffer to store the image.
         Note that the <strong>cgCreateColorBufferU32</strong> doesn't <em>initialize</em> the buffer,
         it only <em>allocates</em> enough memory to <em>store</em> the image.
         This goes against the <strong>"never forget initializing your variables"</strong> mantra, but
-        the values of the color buffer are likely to be discarded and/or written to anyway,
-        so it doesn't really make sense to initialize it with default color values.
+        the values of a newly-allocated color buffer are likely to be immediately discarded and/or written to anyway,
+        so it doesn't really make sense to initialize it with some default color value.
         Instead we have another function that updates the color buffer given a single color:
         <strong>cgClearColorBufferU32</strong>. Note how the 32-bit pixels are generated:
     </p>
     <pre><code class="mono">uint32_t pixel = ((uint32_t)color.x) |
-                 ((uint32_t)color.y &lt&lt 8) |
-                 ((uint32_t)color.z &lt&lt 16) |
-                 ((uint32_t)color.w &lt&lt 24);</code></pre>
+                 ((uint32_t)color.y &lt;&lt; 8) |
+                 ((uint32_t)color.z &lt;&lt; 16) |
+                 ((uint32_t)color.w &lt;&lt; 24);</code></pre>
     <p>
         Here the <strong>x</strong>, <strong>y</strong>, <strong>z</strong>, <strong>w</strong>
         values correspond to the <span style="color: red;">red</span>, <span style="color: green;">green</span>,
@@ -445,32 +461,32 @@ CgColorBufferU32;</code></pre>
         But once the layout is determined, we have to be consistent, and we are: our function <strong>cgColorBufferU32ToPPM</strong>
         assumes the red will be found in the least significant 8 bits of the given <strong>uint32_t</strong> value:
     </p>
-    <pre><code class="mono">uint32_t pixel = colorBuffer-&gtpixels[i];
-uint8_t red = *((uint8_t*)&pixel + 0);
-uint8_t green = *((uint8_t*)&pixel + 1);
-uint8_t blue = *((uint8_t*)&pixel + 2);
+    <pre><code class="mono">uint32_t pixel = colorBuffer-&gt;pixels[i];
+uint8_t red = *((uint8_t*)&amp;pixel + 0);
+uint8_t green = *((uint8_t*)&amp;pixel + 1);
+uint8_t blue = *((uint8_t*)&amp;pixel + 2);
 fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     <p>
         An image with a single color is kind of boring though. We can write another function <strong>cgGradientColorBufferU32</strong>
         that draws a gradient across the image:
     </p>
-    <pre><code class="mono">void cgGradientColorBufferU32(CgColorBufferU32* restrict colorBuffer,
+    <pre><code class="mono">void cgGradientColorBufferU32(CgColorBufferU32* colorBuffer,
                               CgVec4U8 topLeftColor,
                               CgVec4U8 topRightColor,
                               CgVec4U8 bottomLeftColor,
                               CgVec4U8 bottomRightColor)
 {
-    assert(colorBuffer && "cgGradientColorBufferU32: colorBuffer is NULL");
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferU32: colorBuffer is NULL");
 
     CgVec4F32 topLeftColorF32 = cgConvertVec4U8ToF32(topLeftColor);
     CgVec4F32 topRightColorF32 = cgConvertVec4U8ToF32(topRightColor);
     CgVec4F32 bottomLeftColorF32 = cgConvertVec4U8ToF32(bottomLeftColor);
     CgVec4F32 bottomRightColorF32 = cgConvertVec4U8ToF32(bottomRightColor);
 
-    for (uint32_t i = 0; i &lt colorBuffer->width; ++i) {
-        float x = (float)i / (float)colorBuffer->width;
-        for (uint32_t j = 0; j &lt colorBuffer->height; ++j) {
-            float y = (float)j / (float)colorBuffer->height;
+    for (uint32_t i = 0; i &lt; colorBuffer-&gt;width; ++i) {
+        float x = (float)i / (float)colorBuffer-&gt;width;
+        for (uint32_t j = 0; j &lt; colorBuffer-&gt;height; ++j) {
+            float y = (float)j / (float)colorBuffer-&gt;height;
 
             CgVec4F32 topColor = cgLerpVec4F32(topLeftColorF32, topRightColorF32, x);
             CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColorF32, bottomRightColorF32, x);
@@ -478,7 +494,7 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
 
             CgVec4U8 color = cgConvertVec4F32ToU8(finalColor);
             uint32_t pixel = cgConvertVec4U8ToU32(color);
-            colorBuffer-&gtpixels[j * colorBuffer-&gtwidth + i] = pixel;
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = pixel;
         }
     }
 }</code></pre>
@@ -555,9 +571,9 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     <pre><code class="mono">uint32_t cgConvertVec4U8ToU32(CgVec4U8 color)
 {
     uint32_t pixel = ((uint32_t)color.x) |
-                     ((uint32_t)color.y &lt&lt 8) |
-                     ((uint32_t)color.z &lt&lt 16) |
-                     ((uint32_t)color.w &lt&lt 24);
+                     ((uint32_t)color.y &lt;&lt; 8) |
+                     ((uint32_t)color.z &lt;&lt; 16) |
+                     ((uint32_t)color.w &lt;&lt; 24);
     return pixel;
 }</code></pre>
     <p>
@@ -571,7 +587,182 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     </p>
     <p>
         You need to understand interpolation <em>well</em>, because we will use it again, albeit for a different geometry.
-        Here is the <a href="../code/cursedgl/0.c" target="_blank">full source code</a> that draws the above image.
+        The full source code is below:
+    </p>
+    <details>
+        <summary>Click to see the code</summary>
+    <pre><code class="mono">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+
+typedef struct
+{
+    uint8_t x;
+    uint8_t y;
+    uint8_t z;
+    uint8_t w;
+}
+CgVec4U8;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float w;
+}
+CgVec4F32;
+
+CgVec4F32 cgConvertVec4U8ToF32(CgVec4U8 v)
+{
+    CgVec4F32 r = { .x = (float)v.x,
+                    .y = (float)v.y,
+                    .z = (float)v.z,
+                    .w = (float)v.w };
+    return r;
+}
+
+CgVec4U8 cgConvertVec4F32ToU8(CgVec4F32 v)
+{
+    CgVec4U8 r = { .x = (uint8_t)v.x,
+                   .y = (uint8_t)v.y,
+                   .z = (uint8_t)v.z,
+                   .w = (uint8_t)v.w };
+    return r;
+}
+
+uint32_t cgConvertVec4U8ToU32(CgVec4U8 color)
+{
+    uint32_t pixel = ((uint32_t)color.x) |
+                     ((uint32_t)color.y &lt;&lt; 8) |
+                     ((uint32_t)color.z &lt;&lt; 16) |
+                     ((uint32_t)color.w &lt;&lt; 24);
+    return pixel;
+}
+
+CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+                        CgVec4F32 q,
+                        float k)
+{
+    CgVec4F32 r = {
+        .x = (1.0f - k) * p.x + k * q.x,
+        .y = (1.0f - k) * p.y + k * q.y,
+        .z = (1.0f - k) * p.z + k * q.z,
+        .w = (1.0f - k) * p.w + k * q.w
+    };
+    return r;
+}
+
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    uint32_t* pixels;
+}
+CgColorBufferU32;
+
+CgColorBufferU32 cgCreateColorBufferU32(uint32_t width,
+                                        uint32_t height)
+{
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferU32: width or height is zero");
+
+    CgColorBufferU32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = malloc(width * height * sizeof(uint32_t));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferU32::malloc:");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}
+
+void cgClearColorBufferU32(CgColorBufferU32* colorBuffer,
+                           CgVec4U8 color)
+{
+    assert(colorBuffer &amp;&amp; "cgClearColorBufferU32: colorBuffer is NULL");
+
+    uint32_t pixel = cgConvertVec4U8ToU32(color);
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        colorBuffer-&gt;pixels[i] = pixel;
+    }
+}
+
+void cgGradientColorBufferU32(CgColorBufferU32* colorBuffer,
+                              CgVec4U8 topLeftColor,
+                              CgVec4U8 topRightColor,
+                              CgVec4U8 bottomLeftColor,
+                              CgVec4U8 bottomRightColor)
+{
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferU32: colorBuffer is NULL");
+
+    CgVec4F32 topLeftColorF32 = cgConvertVec4U8ToF32(topLeftColor);
+    CgVec4F32 topRightColorF32 = cgConvertVec4U8ToF32(topRightColor);
+    CgVec4F32 bottomLeftColorF32 = cgConvertVec4U8ToF32(bottomLeftColor);
+    CgVec4F32 bottomRightColorF32 = cgConvertVec4U8ToF32(bottomRightColor);
+
+    for (uint32_t i = 0; i &lt; colorBuffer-&gt;width; ++i) {
+        float x = (float)i / (float)colorBuffer-&gt;width;
+        for (uint32_t j = 0; j &lt; colorBuffer-&gt;height; ++j) {
+            float y = (float)j / (float)colorBuffer-&gt;height;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColorF32, topRightColorF32, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColorF32, bottomRightColorF32, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            CgVec4U8 color = cgConvertVec4F32ToU8(finalColor);
+            uint32_t pixel = cgConvertVec4U8ToU32(color);
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = pixel;
+        }
+    }
+}
+
+void cgColorBufferU32ToPPM(const CgColorBufferU32* colorBuffer,
+                           const char* path)
+{
+    assert(colorBuffer &amp;&amp; "cgColorBufferU32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferU32ToPPM: path is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        perror("cgColorBufferU32ToPPM::fopen:");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        uint32_t pixel = colorBuffer-&gt;pixels[i];
+        uint8_t red = *((uint8_t*)&amp;pixel + 0);
+        uint8_t green = *((uint8_t*)&amp;pixel + 1);
+        uint8_t blue = *((uint8_t*)&amp;pixel + 2);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}
+
+int main()
+{
+    uint32_t width = 320;
+    uint32_t height = 240;
+    CgColorBufferU32 colorBuffer = cgCreateColorBufferU32(width, height);
+    CgVec4U8 topLeftColor = { 255, 0, 0, 255 };
+    CgVec4U8 topRightColor = { 0, 255, 0, 255 };
+    CgVec4U8 bottomLeftColor = { 0, 0, 255, 255 };
+    CgVec4U8 bottomRightColor = { 255, 255, 0, 255 };
+    cgGradientColorBufferU32(&amp;colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
+    cgColorBufferU32ToPPM(&amp;colorBuffer, "sample.ppm");
+    return 0;
+}
+    </code></pre>
+    </details>
+    <p>
+        By the way, the astute amongst you might have noticed an inconsistency in the naming. Namely, <strong>cgConvertVec4U8ToU32</strong>
+        doesn't return a <strong>CgVec4U32</strong> (we haven't even defined it!), instead it returns a plain <strong>uint32_t</strong>. You may fix this
+        by renaming <strong>cgConvertVec4U8ToU32</strong> to a more apt <strong>cgConvertVec4U8ToU32Scalar</strong>.
     </p>
     </article>
 
@@ -589,9 +780,11 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     </p>
     <p>
         A problem that we are facing now is that our colors are <em>wrong</em>. We talked about how the human eye is more sensitive
-        to certain colors more than others. Well, it turns out that our eyes become more sensitive to light in darker environments, too.
+        to certain colors than others. Well, it turns out that our eyes become more sensitive to light in <em>darker</em> environments, too.
         I don't exactly know why this is the case, but it could be an evolutionary adaptation to increase chances of survival
-        for our ancestors when they met their nocturnal enemies. Look at the image below that I yoinked from <a href="https://learnopengl.com" target="_blank">learnopengl.com</a>
+        for our ancestors living amongst nocturnal predators.
+    </p>
+    <p>Look at the image below that I yoinked from <a href="https://learnopengl.com" target="_blank">learnopengl.com</a>
         (there will be a lot of yoinking in this article&#8212standing on the shoulders of giants or something):
     </p>
     <p>
@@ -601,10 +794,10 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         Looking at the physical brightness values, they don't seem to be evenly-spaced, even though they are.
         There is only a constant amount of difference between the colors of the boxes in the physical brightness row,
         even though it doesn't look that way. In contrast, the difference between the colors of the boxes in the
-        perceived brightness row <em>varies</em>, and yet the difference seems constant to us.
-        Alas, our delusions triumph reality, and our hallucinations gain an upper hand.
+        perceived brightness row <em>varies</em>, and yet the difference <em>seems</em> constant.
+        Alas, our delusions triumph, and our hallucinations gain an upper hand.
         To satisfy our false perceptions, we must map the physical brightness to perceived brightness, lest the colors will look wrong.
-        This mapping is done implicitly by our computers, using a power law relationship:
+        This mapping is defined by a <a href="https://en.wikipedia.org/wiki/Power_law" target="_blank">power law</a>:
     </p>
     <p style="text-align: center;">
         \( C_{gamma} = {C_{linear}}^{k} \) <span style="float: right;">(1)</span>
@@ -612,12 +805,13 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
     <p>
         Here \(C_{linear} \) is the color that we generated using <strong>cgGradientColorBufferU32</strong>, but the actual color on the screen
         will be \(C_{gamma} \). Think about it for a second. Because we used values between 0 and 255 to represent our color values,
-        you may conclude that \(C_{gamma} \) for a color value of 128 will be 16384 (assuming k is 2), but this is not the case.
-        (1) is defined for color values between 0.0 and 1.0, so a value of 128 will actually be 0.5; and when you compute 0.5 to the power of 2,
+        you may conclude that \(C_{gamma} \) for a color value of 128 will be 16384 (assuming <strong>k</strong> is 2), but this is not the case.
+        (1) is defined for color values between 0.0 and 1.0, so a value of 128 will actually be 0.5&mdash;when you raise 0.5 to the power of 2,
         you get 0.25, a lower value! Therefore, the output of <strong>cgGradientColorBufferU32</strong> will look <em>dimmer</em>.
     </p>
     <p>
-        The solution is to apply <em>gamma correction</em>, which we can by simply applying the inverse of (1) to the output of <strong>cgGradientColorBufferU32</strong>:
+        The solution is to store our colors <em>after</em> applying <em>gamma correction</em>, which we do by raising the output of
+        <strong>cgGradientColorBufferU32</strong> to the <em>inverse</em> of <strong>k</strong>:
     </p>
     <p style="text-align: center;">
         \(C_{encoded} = {C_{linear}}^{1/k} \) <span style="float: right;">(2)</span>
@@ -627,11 +821,12 @@ fprintf(fp, "%u %u %u\n", red, green, blue);</code></pre>
         since for any value \( x \) we have \( ({{x}^{1/k}})^{k} = x^1 = x \).
     </p>
     <p>
-        Unfortunately, <strong>cgGradientColorBufferU32</strong> produces <strong>uint32_t</strong> colors between 0 and 255,
+        Unfortunately, <strong>cgGradientColorBufferU32</strong> produces <strong>uint32_t</strong> colors that store the
+        <span style="color:red;">red</span>, <span style="color: green;">green</span>, and <span style="color: blue;">blue</span> components
+        as <strong>uint8_t</strong> values,
         but (2) assumes that \(C_{linear} \) is a floating-point value between 0.0 and 1.0.
-        Instead of using a <strong>uint32_t</strong> value between 0 and 255, we will
-        represent the components (i.e. <span style="color: red;">red</span>, <span style="color: green;">green</span>, <span style="color: blue;">blue</span>)
-        of our colors as floating-point values between 0.0 and 1.0. Let's see how that looks in practice. First, we define
+        Instead of using unsigned integers, we will
+        represent the components of our colors as floating-point values between 0.0 and 1.0. Let's see how that looks in practice. First, we define
         a floating-point variant of <strong>CgColorBufferU32</strong>:
     </p>
     <pre><code class="mono">typedef struct
@@ -647,38 +842,38 @@ CgColorBufferF32;</code></pre>
     <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
                                         uint32_t height)
 {
-    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
 
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
     colorBuffer.pixels = malloc(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferF32");
+        perror("cgCreateColorBufferF32::malloc:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
 }</code></pre>
     <p>
         We also write the floating-point variant of <strong>cgColorBufferU32ToPPM</strong>, except this time
-        we apply gamma correction to every pixel:
+        we apply gamma correction:
     </p>
-    <pre><code class="mono">void cgColorBufferF32ToPPM(const CgColorBufferF32* restrict colorBuffer,
-                           const char* restrict path,
+    <pre><code class="mono">void cgColorBufferF32ToPPM(const CgColorBufferF32* colorBuffer,
+                           const char* path,
                            float gamma)
 {
-    assert(colorBuffer && "cgColorBufferF32ToPPM: colorBuffer is NULL");
-    assert(path && "cgColorBufferF32ToPPM: path is NULL");
+    assert(colorBuffer &amp;&amp; "cgColorBufferF32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferF32ToPPM: path is NULL");
 
     FILE* fp = fopen(path, "w");
     if (!fp) {
-        perror("cgColorBufferF32ToPPM");
+        perror("cgColorBufferF32ToPPM::fopen:");
         exit(EXIT_FAILURE);
     }
     fprintf(fp, "P3\n");
-    fprintf(fp, "%u %u\n", colorBuffer-&gtwidth, colorBuffer-&gtheight);
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
     fprintf(fp, "255\n");
-    uint32_t resolution = colorBuffer-&gtwidth * colorBuffer-&gtheight;
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gtheight;
     for (uint32_t i = 0; i < resolution; ++i) {
         CgVec4F32 pixel = colorBuffer->pixels[i];
         CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
@@ -694,6 +889,7 @@ CgColorBufferF32;</code></pre>
     </p>
     <pre><code class="mono">CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
 {
+    assert(gamma != 0.0f &amp;&amp; "cgApplyGammaToVec4F32: gamma cannot be 0");
     CgVec4F32 gammaEncodedPixel = {
         .x = powf(pixel.x, 1.0f / gamma),
         .y = powf(pixel.y, 1.0f / gamma),
@@ -705,46 +901,175 @@ CgColorBufferF32;</code></pre>
     <p>
         The floating-point version of <strong>cgGradientColorBufferU32</strong> is:
     </p>
-    <pre><code class="mono">void cgGradientColorBufferF32(CgColorBufferF32* restrict colorBuffer,
+    <pre><code class="mono">void cgGradientColorBufferF32(CgColorBufferF32* colorBuffer,
                               CgVec4F32 topLeftColor,
                               CgVec4F32 topRightColor,
                               CgVec4F32 bottomLeftColor,
                               CgVec4F32 bottomRightColor)
 {
-    assert(colorBuffer && "cgGradientColorBufferU32: colorBuffer is NULL");
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferF32: colorBuffer is NULL");
 
-    for (uint32_t i = 0; i &lt colorBuffer-&gtwidth; ++i) {
+    for (uint32_t i = 0; i &lt; colorBuffer-&gtwidth; ++i) {
         float x = (float)i / (float)colorBuffer-&gtwidth;
-        for (uint32_t j = 0; j &lt colorBuffer-&gtheight; ++j) {
+        for (uint32_t j = 0; j &lt; colorBuffer-&gtheight; ++j) {
             float y = (float)j / (float)colorBuffer-&gtheight;
 
             CgVec4F32 topColor = cgLerpVec4F32(topLeftColor, topRightColor, x);
             CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
             CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
 
-            colorBuffer-&gtpixels[j * colorBuffer-&gtwidth + i] = finalColor;
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = finalColor;
         }
     }
 }</code></pre>
     <p>
-        Here is the full <a href="../code/cursedgl/1.c" target="_blank">source code</a> (don't forget to link the math library).
-        Notice how <strong>cgGradientColorBufferF32</strong> is <em>simpler</em> than its <strong>U32</strong> variant,
-        mainly because we no longer need <strong>uint32_t</strong> -&gt <strong>float</strong> conversions like before.
+        Below is the full source code (don't forget to link the math library):
     </p>
+    <details>
+        <summary>Click to see the code</summary>
+        <pre><code class="mono">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;math.h&gt;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float w;
+}
+CgVec4F32;
+
+CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+                        CgVec4F32 q,
+                        float k)
+{
+    CgVec4F32 r = {
+        .x = (1.0f - k) * p.x + k * q.x,
+        .y = (1.0f - k) * p.y + k * q.y,
+        .z = (1.0f - k) * p.z + k * q.z,
+        .w = (1.0f - k) * p.w + k * q.w
+    };
+    return r;
+}
+
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    CgVec4F32* pixels;
+}
+CgColorBufferF32;
+
+CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
+                                        uint32_t height)
+{
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
+
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = malloc(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferF32::malloc:");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}
+
+void cgGradientColorBufferF32(CgColorBufferF32* colorBuffer,
+                              CgVec4F32 topLeftColor,
+                              CgVec4F32 topRightColor,
+                              CgVec4F32 bottomLeftColor,
+                              CgVec4F32 bottomRightColor)
+{
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferF32: colorBuffer is NULL");
+
+    for (uint32_t i = 0; i &lt; colorBuffer-&gt;width; ++i) {
+        float x = (float)i / (float)colorBuffer-&gt;width;
+        for (uint32_t j = 0; j &lt; colorBuffer-&gt;height; ++j) {
+            float y = (float)j / (float)colorBuffer-&gt;height;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColor, topRightColor, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = finalColor;
+        }
+    }
+}
+
+CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
+{
+    assert(gamma != 0.0f &amp;&amp; "cgApplyGammaToVec4F32: gamma cannot be 0");
+    CgVec4F32 gammaEncodedPixel = {
+        .x = powf(pixel.x, 1.0f / gamma),
+        .y = powf(pixel.y, 1.0f / gamma),
+        .z = powf(pixel.z, 1.0f / gamma),
+        .w = pixel.w
+    };
+    return gammaEncodedPixel;
+}
+
+void cgColorBufferF32ToPPM(const CgColorBufferF32* colorBuffer,
+                           const char* path,
+                           float gamma)
+{
+    assert(colorBuffer &amp;&amp; "cgColorBufferF32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferF32ToPPM: path is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        perror("cgColorBufferF32ToPPM::fopen:");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        CgVec4F32 pixel = colorBuffer-&gt;pixels[i];
+        CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
+        uint8_t red = (uint8_t)(gammaEncodedPixel.x * 255.0f);
+        uint8_t green = (uint8_t)(gammaEncodedPixel.y * 255.0f);
+        uint8_t blue = (uint8_t)(gammaEncodedPixel.z * 255.0f);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}
+
+int main()
+{
+    uint32_t width = 320;
+    uint32_t height = 240;
+    float gamma = 2.2f;
+    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height);
+    CgVec4F32 topLeftColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+    CgVec4F32 topRightColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+    CgVec4F32 bottomLeftColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+    CgVec4F32 bottomRightColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    cgGradientColorBufferF32(&amp;colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
+    cgColorBufferF32ToPPM(&amp;colorBuffer, "sample.ppm", gamma);
+    return 0;
+}
+        </code></pre>
+    </details>
     <p>
-        The question is, what value should we use for <em>gamma</em>? Monitors often use 2.2,
+        The question is, what value should we use for <em>gamma</em>? Monitors often use a value around 2.2,
         but I decided to make it a tweakable parameter so that the user can change it. If we use a gamma value
-        of 2.2, then the linearly interpolated image that we had generated previously will look like this:
+        of 2.2, then the image will look like this:
     </p>
     <p>
         <img alt="Gamma-corrected output" src="../img/cursedgl_2.png">
     </p>
     <p>
-        Compare it with the previous image. Note how the colors are much brighter. Your monitor may use
+        Compare it with the previous image. Notice how the colors are much brighter. Your monitor/OS may use
         a different value for gamma, in which case you may need to adjust it further.
     </p>
     <p>
-        I touched only briefly on <em>gamma correction</em>, but there is more to it. You may want to read this
+        I touched only briefly on <em>gamma correction</em>. If you want more, then you may read this
         <a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma" target="_blank">excellent article</a>
         by John Novak, who delves much deeper into the topic, and also shows what happens when your gamma values are incorrect.
     </p>
@@ -753,17 +1078,18 @@ CgColorBufferF32;</code></pre>
     <h2 id="memory">Memory</h2>
     <article>
     <p>
-        So far in our application we used the standard library routine <strong>malloc</strong> for our memory allocations.
+        Up to this point we have used the standard library routine <strong>malloc</strong> for our memory allocations.
         While there isn't anything inherently wrong with <strong>malloc</strong>, it's more judicious to allow the programmer
-        choose her own memory allocation routine. And in case she doesn't, we can easily revert back to <strong>malloc</strong>.
+        choose her own memory allocation routine. And in case she doesn't, we can easily default back to <strong>malloc</strong>.
     </p>
     <p>
-        Another issue with our code is that we don't release the memory that we had allocated once the application exits.
-        This wasn't really an issue before since your operating system has no problem cleaning all that mess,
-        but it's a good habit to make sure that our application cleans after itself at the end of its lifecycle.
+        Another issue with our code is that we don't release the memory that we had allocated
+        (this is called <a href="https://en.wikipedia.org/wiki/Memory_leak" target="_blank">memory leak</a>).
+        This wasn't really an issue before since our application has been very simple and the OS had no problem cleaning all that mess,
+        but going forward we will make sure not to leak any memory.
     </p>
     <p>
-        We can solve the first problem by creating a new structure to store allocation/de-allocation routines:
+        We can solve the first problem by creating a new structure to store pointers to custom allocation/de-allocation routines:
     </p>
     <pre><code class="mono">typedef struct
 {
@@ -772,28 +1098,30 @@ CgColorBufferF32;</code></pre>
 }
 CgMemoryAllocator;</code></pre>
     <p>
-        Then we modify the <strong>cgCreateColorBufferF32</strong> function so that it accepts these custom-defined memory allocation routines:
+        Then we modify the <strong>cgCreateColorBufferF32</strong> function so that it can use our custom functions instead of
+        the previously hard-coded <strong>malloc</strong>:
     </p>
     <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
                                         uint32_t height,
                                         CgMemoryAllocator* allocator)
 {
-    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
-    assert(allocator && "cgCreateColorBufferF32: allocator is NULL");
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
+    assert(allocator &amp;&amp; "cgCreateColorBufferF32: allocator is NULL");
 
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = allocator->alloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = allocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferF32");
+        perror("cgCreateColorBufferF32::alloc_mem:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
 }</code></pre>
     <p>
-        It may be the case that the programmer has no problem using the default allocation routines like the <strong>malloc</strong> function,
-        so we define another function <strong>cgGetDefaultAllocator</strong>, that returns those routines:
+        It may be the case that the programmer prefers to use the default <strong>malloc</strong> function
+        (maybe she's too lazy to write her own memory allocator!),
+        so we define another function <strong>cgGetDefaultAllocator</strong> as a fallback:
     </p>
     <pre><code class="mono">CgMemoryAllocator* cgGetDefaultAllocator()
 {
@@ -801,30 +1129,189 @@ CgMemoryAllocator;</code></pre>
         .alloc_mem = malloc,
         .free_mem = free
     };
-    return &allocator;
+    return &amp;allocator;
 }</code></pre>
     <p>
-        To solve the second problem, we define another function, called <strong>cgDestroyColorBufferF32</strong>,
+        To solve the second problem, we define another function, called <strong>cgDestroyColorBufferF32</strong>
         that the programmer can use to release the memory allocated for the color buffer:
     </p>
     <pre><code class="mono">void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
                              CgMemoryAllocator* allocator)
 {
-    assert(buffer && "cgDestroyColorBufferF32: buffer is NULL");
-    assert(allocator && "cgDestroyColorBufferF32: allocator is NULL");
+    assert(buffer &amp;&amp; "cgDestroyColorBufferF32: buffer is NULL");
+    assert(allocator &amp;&amp; "cgDestroyColorBufferF32: allocator is NULL");
 
-    allocator-&gtfree_mem(buffer-&gtpixels);
-    buffer-&gtwidth = buffer-&gtheight = 0;
+    allocator-&gt;free_mem(buffer-&gt;pixels);
+    buffer-&gt;width = buffer-&gt;height = 0;
 }</code></pre>
     <p>
         In the future we will define our own custom memory allocation functions, and <strong>CgMemoryAllocator</strong>
-        will prove more useful than it seems now. See the full <a href="../code/cursedgl/2.c" target="_blank">source code</a>.
+        will prove more useful than it seems now. The full source code is below.
     </p>
+    <details>
+        <summary>Click to see the code</summary>
+        <pre><code class="mono">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;math.h&gt;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float w;
+}
+CgVec4F32;
+
+CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+                        CgVec4F32 q,
+                        float k)
+{
+    CgVec4F32 r = {
+        .x = (1.0f - k) * p.x + k * q.x,
+        .y = (1.0f - k) * p.y + k * q.y,
+        .z = (1.0f - k) * p.z + k * q.z,
+        .w = (1.0f - k) * p.w + k * q.w
+    };
+    return r;
+}
+
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    CgVec4F32* pixels;
+}
+CgColorBufferF32;
+
+typedef struct
+{
+    void* (*alloc_mem)(size_t);
+    void (*free_mem)(void*);
+}
+CgMemoryAllocator;
+
+CgMemoryAllocator* cgGetDefaultAllocator()
+{
+    static CgMemoryAllocator allocator = {
+        .alloc_mem = malloc,
+        .free_mem = free
+    };
+    return &amp;allocator;
+}
+
+CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
+                                        uint32_t height,
+                                        CgMemoryAllocator* allocator)
+{
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
+    assert(allocator &amp;&amp; "cgCreateColorBufferF32: allocator is NULL");
+
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = allocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        perror("cgCreateColorBufferF32::alloc_mem:");
+        exit(EXIT_FAILURE);
+    }
+    return colorBuffer;
+}
+
+void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
+                             CgMemoryAllocator* allocator)
+{
+    assert(buffer &amp;&amp; "cgDestroyColorBufferF32: buffer is NULL");
+    assert(allocator &amp;&amp; "cgDestroyColorBufferF32: allocator is NULL");
+
+    allocator-&gt;free_mem(buffer-&gt;pixels);
+    buffer-&gt;width = buffer-&gt;height = 0;
+}
+
+void cgGradientColorBufferF32(CgColorBufferF32* colorBuffer,
+                              CgVec4F32 topLeftColor,
+                              CgVec4F32 topRightColor,
+                              CgVec4F32 bottomLeftColor,
+                              CgVec4F32 bottomRightColor)
+{
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferF32: colorBuffer is NULL");
+
+    for (uint32_t i = 0; i &lt; colorBuffer-&gt;width; ++i) {
+        float x = (float)i / (float)colorBuffer-&gt;width;
+        for (uint32_t j = 0; j &lt; colorBuffer-&gt;height; ++j) {
+            float y = (float)j / (float)colorBuffer-&gt;height;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColor, topRightColor, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = finalColor;
+        }
+    }
+}
+
+CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
+{
+    CgVec4F32 gammaEncodedPixel = {
+        .x = powf(pixel.x, 1.0f / gamma),
+        .y = powf(pixel.y, 1.0f / gamma),
+        .z = powf(pixel.z, 1.0f / gamma),
+        .w = pixel.w
+    };
+    return gammaEncodedPixel;
+}
+
+void cgColorBufferF32ToPPM(const CgColorBufferF32* colorBuffer,
+                           const char* path,
+                           float gamma)
+{
+    assert(colorBuffer &amp;&amp; "cgColorBufferF32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferF32ToPPM: path is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        perror("cgColorBufferF32ToPPM::fopen:");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        CgVec4F32 pixel = colorBuffer-&gt;pixels[i];
+        CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
+        uint8_t red = (uint8_t)(gammaEncodedPixel.x * 255.0f);
+        uint8_t green = (uint8_t)(gammaEncodedPixel.y * 255.0f);
+        uint8_t blue = (uint8_t)(gammaEncodedPixel.z * 255.0f);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}
+
+int main()
+{
+    uint32_t width = 320;
+    uint32_t height = 240;
+    float gamma = 2.2f;
+    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(width, height, cgGetDefaultAllocator());
+    CgVec4F32 topLeftColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+    CgVec4F32 topRightColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+    CgVec4F32 bottomLeftColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+    CgVec4F32 bottomRightColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    cgGradientColorBufferF32(&amp;colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
+    cgColorBufferF32ToPPM(&amp;colorBuffer, "sample.ppm", gamma);
+    cgDestroyColorBufferF32(&amp;colorBuffer, cgGetDefaultAllocator());
+    return 0;
+}
+        </code></pre>
+    </details>
     </article>
     <h2 id="error-handling">Error Handling</h2>
     <article>
     <p>
-        So far we have followed the pattern of giving the programmer as much control as possible over the application, except when it comes to handling of errors.
+        We have followed the pattern of giving the programmer as much control as possible over the application&mdash;except when it comes to handling of errors.
         For example, when <strong>cgCreateColorBufferF32</strong> fails to allocate memory, it simply outputs a message by calling <strong>perror</strong> and then exits.
         But what if the programmer is interested in <em>logging</em> the message, or maybe she doesn't appreciate the application shutting down, and instead would
         rather write her own logic for failure cases like this? <strong>cgColorBufferF32ToPPM</strong> is another culprit:
@@ -915,7 +1402,8 @@ CgApplication;</code></pre>
     </article>
 
     <!-- POINTS -->
-    <h2 id="points">In the beginning, there was a point</h2>
+    <h2 id="points">In the beginning was ... well ... a jot, a speck, a fleck at once incomprehensibly small but unimaginably dense</h2>
+    <p class="quote">From Chapter 1 of <a href="https://a.co/d/6zdXWcS" target="_blank">"A Brief History of Earth"</a>, by Andrew H. Knoll.</p>
     <article>
     <p>
         The simplest possible geometry to render is a point.
