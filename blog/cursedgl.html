@@ -1093,8 +1093,8 @@ int main()
     </p>
     <pre><code class="mono">typedef struct
 {
-    void* (*alloc_mem)(size_t);
-    void (*free_mem)(void*);
+    void* (*allocBytes)(size_t);
+    void (*freeBytes)(void*);
 }
 CgMemoryAllocator;</code></pre>
     <p>
@@ -1111,9 +1111,9 @@ CgMemoryAllocator;</code></pre>
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = allocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = allocator-&gt;allocBytes(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferF32::alloc_mem:");
+        perror("cgCreateColorBufferF32::allocBytes:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
@@ -1126,8 +1126,8 @@ CgMemoryAllocator;</code></pre>
     <pre><code class="mono">CgMemoryAllocator* cgGetDefaultAllocator()
 {
     static CgMemoryAllocator allocator = {
-        .alloc_mem = malloc,
-        .free_mem = free
+        .allocBytes = malloc,
+        .freeBytes = free
     };
     return &amp;allocator;
 }</code></pre>
@@ -1141,7 +1141,7 @@ CgMemoryAllocator;</code></pre>
     assert(buffer &amp;&amp; "cgDestroyColorBufferF32: buffer is NULL");
     assert(allocator &amp;&amp; "cgDestroyColorBufferF32: allocator is NULL");
 
-    allocator-&gt;free_mem(buffer-&gt;pixels);
+    allocator-&gt;freeBytes(buffer-&gt;pixels);
     buffer-&gt;width = buffer-&gt;height = 0;
 }</code></pre>
     <p>
@@ -1188,16 +1188,16 @@ CgColorBufferF32;
 
 typedef struct
 {
-    void* (*alloc_mem)(size_t);
-    void (*free_mem)(void*);
+    void* (*allocBytes)(size_t);
+    void (*freeBytes)(void*);
 }
 CgMemoryAllocator;
 
 CgMemoryAllocator* cgGetDefaultAllocator()
 {
     static CgMemoryAllocator allocator = {
-        .alloc_mem = malloc,
-        .free_mem = free
+        .allocBytes = malloc,
+        .freeBytes = free
     };
     return &amp;allocator;
 }
@@ -1212,9 +1212,9 @@ CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = allocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = allocator-&gt;allocBytes(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        perror("cgCreateColorBufferF32::alloc_mem:");
+        perror("cgCreateColorBufferF32::allocBytes:");
         exit(EXIT_FAILURE);
     }
     return colorBuffer;
@@ -1226,7 +1226,7 @@ void cgDestroyColorBufferF32(CgColorBufferF32* buffer,
     assert(buffer &amp;&amp; "cgDestroyColorBufferF32: buffer is NULL");
     assert(allocator &amp;&amp; "cgDestroyColorBufferF32: allocator is NULL");
 
-    allocator-&gt;free_mem(buffer-&gt;pixels);
+    allocator-&gt;freeBytes(buffer-&gt;pixels);
     buffer-&gt;width = buffer-&gt;height = 0;
 }
 
@@ -1357,7 +1357,7 @@ CgApplication;</code></pre>
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;allocBytes(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
         application-&gt;errorCallback(CG_OUT_OF_MEMORY, "cgCreateColorBufferF32: memory allocation failed");
     }
@@ -1411,16 +1411,16 @@ CgColorBufferF32;
 
 typedef struct
 {
-    void* (*alloc_mem)(size_t);
-    void (*free_mem)(void*);
+    void* (*allocBytes)(size_t);
+    void (*freeBytes)(void*);
 }
 CgMemoryAllocator;
 
 CgMemoryAllocator* cgGetDefaultAllocator()
 {
     static CgMemoryAllocator allocator = {
-        .alloc_mem = malloc,
-        .free_mem = free
+        .allocBytes = malloc,
+        .freeBytes = free
     };
     return &allocator;
 }
@@ -1457,7 +1457,7 @@ CgColorBufferF32 cgCreateColorBufferF32(CgApplication* application,
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;allocBytes(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
         application-&gt;errorCallback(CG_OUT_OF_MEMORY, "cgCreateColorBufferF32: memory allocation failed");
     }
@@ -1471,7 +1471,7 @@ void cgDestroyColorBufferF32(CgApplication* application,
     assert(application &amp;&amp; "cgDestroyColorBufferF32: application is NULL");
     assert(application-&gt;memoryAllocator &amp;&amp; "cgDestroyColorBufferF32: memoryAllocator is NULL");
 
-    application-&gt;memoryAllocator-&gt;free_mem(buffer-&gt;pixels);
+    application-&gt;memoryAllocator-&gt;freeBytes(buffer-&gt;pixels);
     buffer-&gt;width = buffer-&gt;height = 0;
 }
 
@@ -1563,7 +1563,7 @@ int main()
     </details>
     <p>
         We are now ready to begin rendering actual objects, starting from the simplest one.
-    </p>
+</p>
     </article>
 
     <!-- POINTS -->
