@@ -1311,93 +1311,258 @@ int main()
     <h2 id="error-handling">Error Handling</h2>
     <article>
     <p>
-        We have followed the pattern of giving the programmer as much control as possible over the application&mdash;except when it comes to handling of errors.
-        For example, when <strong>cgCreateColorBufferF32</strong> fails to allocate memory, it simply outputs a message by calling <strong>perror</strong> and then exits.
-        But what if the programmer is interested in <em>logging</em> the message, or maybe she doesn't appreciate the application shutting down, and instead would
-        rather write her own logic for failure cases like this? <strong>cgColorBufferF32ToPPM</strong> is another culprit:
-        it will also shut down the application if it fails to open a file descriptor.
+        Another issue in need of redressing is the handling of errors. Our code <em>does</em> handle errors (in the sense that at least they aren't ignored) but
+        in a very inadequate way. For example,
+        when <strong>cgCreateColorBufferF32</strong> fails to allocate memory, it simply outputs a message by calling <strong>perror</strong> and then terminates the application.
+        But what if the programmer is interested in <em>logging</em> the message, or maybe she doesn't appreciate the application shutting down and instead would
+        rather write her own logic for different failure cases? <strong>cgColorBufferF32ToPPM</strong> has a similar problem&mdash;it
+        will shut down the application if it fails to open a file descriptor.
     </p>
     <p>
-        We can defer the logic of error-handling to the programmer similar to how we deferred memory allocations.
-        Namely, we will allow the programmer to pass her own logic to those functions where some error <em>may</em> occur,
-        but also provide a default error-handling routine in case the programmer is fine with the default behavior.
+        We can allow the programmer to provide her own error-handling code, and also provide
+        a default error-handling routine as a fallback.
     </p>
-    <p>
-        Our solution is to supply a type definition for an error-callback function:
-    </p>
-    <pre><code class="mono">#define CG_LOG_MAX 500
-
-__attribute__((format(printf, 1, 2)))
-void CgDefaultErrorCallback(const char* args, ...)
+    <pre><code class="mono">void cgDefaultErrorCallback(int code, const char* msg)
 {
-    va_list ap;
-    va_start(ap, args);
-    char output[CG_LOG_MAX];
-    vsnprintf(output, CG_LOG_MAX, args, ap);
-    va_end(ap);
-    printf("[CgDefaultErrorCallback]: %s\n", output);
+    assert(msg &amp;&amp; "cgDefaultErrorCallback: message is NULL");
+    fprintf(stderr, "cgDefaultErrorCallback: %d -&gt; %s\n", code, msg);
+    exit(EXIT_FAILURE);
 }
 
-typedef void (*CgErrorCallback)(const char*, ...);</code></pre>
+typedef void (*CgErrorCallback)(int, const char*);</code></pre>
     <p>
-        The <strong>...</strong> indicates that the function accepts a variable number of arguments. This is so that the programmer can construct her own
-        format strings, which can be useful. The <strong>__attribute__</strong> serves to inform the compiler that the <strong>args</strong> argument
-        is <em>supposed</em> to be a printf-style format string, otherwise it will complain (assuming that you have enabled the warnings).
-    </p>
-    <p>
-        There are two problems here. First, <strong>__attribute__</strong> is just a <em>hint</em> to the compiler that <strong>args</strong> is
-        a printf-style format string. But there is nothing preventing the programmer from passing invalid strings to <strong>CgErrorCallback</strong>.
-        There is a good reason why the compiler is complaining here. Passing the wrong type of string to formatting functions enables a whole class of
-        <a href="https://owasp.org/www-community/attacks/Format_string_attack" target="_blank">security issues</a>.
-        Here we assume that the programmer can control where these strings come from, but if she does something stupid like passing unsanitized user input
-        to <strong>CgErrorCallback</strong>, there really isn't that much that we can do.
-    </p>
-    <p>
-        The second problem is that <strong>__attribute__</strong> is a <em>compiler-specific</em> hint.
-        It works for <a href="https://gcc.gnu.org/" target="_blank">GCC</a>, but it may not work for you if you use a different compiler
-        (your compiler may not even generate a warning). See the documentation of your compiler to see your options. In this article,
-        I will assume that you are using GCC.
+        <strong>cgDefaultErrorCallback</strong> is a bare-bones error-handling routine that exists in case the programmer doesn't provide her own custom error-handling logic.
     </p>
     <p>
         Instead of passing two arguments (one for memory allocation, another for error-handling) we package both in a single structure:
     </p>
     <pre><code class="mono">typedef struct
 {
-    CgMemoryAllocator* allocator;
-    CgErrorCallback callback;
+    CgMemoryAllocator* memoryAllocator;
+    CgErrorCallback errorCallback;
 }
 CgApplication;</code></pre>
     <p>
-        Now we modify our functions so that they accept <strong>CgApplication</strong> instead. For example, <strong>cgCreateColorBufferF32</strong> becomes:
+        <strong>cgCreateColorBufferF32</strong> becomes:
     </p>
-    <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(uint32_t width,
-                                        uint32_t height,
-                                        CgApplication* application)
+    <pre><code class="mono">CgColorBufferF32 cgCreateColorBufferF32(CgApplication* application,
+                                        uint32_t width,
+                                        uint32_t height)
 {
-    assert(width &gt 0 && height &gt 0 && "cgCreateColorBufferF32: width or height is zero");
-    assert(application && "cgCreateColorBufferF32: application is NULL");
-    assert(application-&gtallocator && "cgCreateColorBufferF32: allocator is NULL");
-    assert(application-&gtcallback && "cgCreateColorBufferF32: callback is NULL");
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
+    assert(application &amp;&amp; "cgCreateColorBufferF32: application is NULL");
+    assert(application-&gt;memoryAllocator &amp;&amp; "cgCreateColorBufferF32: memoryAllocator is NULL");
+    assert(application-&gt;errorCallback &amp;&amp; "cgCreateColorBufferF32: errorCallback is NULL");
 
     CgColorBufferF32 colorBuffer = {};
     colorBuffer.width = width;
     colorBuffer.height = height;
-    colorBuffer.pixels = application-&gtallocator-&gtalloc_mem(width * height * sizeof(CgVec4F32));
+    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
     if (!colorBuffer.pixels) {
-        application-&gtcallback("cgCreateColorBufferF32: memory allocation failed");
+        application-&gt;errorCallback(CG_OUT_OF_MEMORY, "cgCreateColorBufferF32: memory allocation failed");
     }
     return colorBuffer;
 }</code></pre>
     <p>
-        The programmer essentially initializes a <strong>CgApplication</strong> object in the beginning of the application, and passes it to
+        The programmer essentially initializes a <strong>CgApplication</strong> object in the beginning of the application and passes it to
         functions where it's needed:
     </p>
     <pre><code class="mono">CgApplication application = {
-    .allocator = cgGetDefaultAllocator(),
-    .callback = CgDefaultErrorCallback
+    .memoryAllocator = cgGetDefaultAllocator(),
+    .errorCallback = cgDefaultErrorCallback
 };</code></pre>
+    <details>
+        <summary>Click to see the code</summary>
+        <pre><code class="mono">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;math.h&gt;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float w;
+}
+CgVec4F32;
+
+CgVec4F32 cgLerpVec4F32(CgVec4F32 p,
+                        CgVec4F32 q,
+                        float k)
+{
+    CgVec4F32 r = {
+        .x = (1.0f - k) * p.x + k * q.x,
+        .y = (1.0f - k) * p.y + k * q.y,
+        .z = (1.0f - k) * p.z + k * q.z,
+        .w = (1.0f - k) * p.w + k * q.w
+    };
+    return r;
+}
+
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    CgVec4F32* pixels;
+}
+CgColorBufferF32;
+
+typedef struct
+{
+    void* (*alloc_mem)(size_t);
+    void (*free_mem)(void*);
+}
+CgMemoryAllocator;
+
+CgMemoryAllocator* cgGetDefaultAllocator()
+{
+    static CgMemoryAllocator allocator = {
+        .alloc_mem = malloc,
+        .free_mem = free
+    };
+    return &allocator;
+}
+
+#define CG_SUCCESS          0
+#define CG_OUT_OF_MEMORY    1
+#define CG_FOPEN_FAILURE    2
+
+void cgDefaultErrorCallback(int code, const char* msg)
+{
+    assert(code != CG_SUCCESS &amp;&amp; "cgDefaultErrorCallback: CG_SUCCESS cannot be used in error callbacks");
+    assert(msg &amp;&amp; "cgDefaultErrorCallback: message is NULL");
+    fprintf(stderr, "cgDefaultErrorCallback: %d -&gt; %s\n", code, msg);
+}
+
+typedef void (*CgErrorCallback)(int, const char*);
+
+typedef struct
+{
+    CgMemoryAllocator* memoryAllocator;
+    CgErrorCallback errorCallback;
+}
+CgApplication;
+
+CgColorBufferF32 cgCreateColorBufferF32(CgApplication* application,
+                                        uint32_t width,
+                                        uint32_t height)
+{
+    assert(width &gt; 0 &amp;&amp; height &gt; 0 &amp;&amp; "cgCreateColorBufferF32: width or height is zero");
+    assert(application &amp;&amp; "cgCreateColorBufferF32: application is NULL");
+    assert(application-&gt;memoryAllocator &amp;&amp; "cgCreateColorBufferF32: memoryAllocator is NULL");
+    assert(application-&gt;errorCallback &amp;&amp; "cgCreateColorBufferF32: errorCallback is NULL");
+
+    CgColorBufferF32 colorBuffer = {};
+    colorBuffer.width = width;
+    colorBuffer.height = height;
+    colorBuffer.pixels = application-&gt;memoryAllocator-&gt;alloc_mem(width * height * sizeof(CgVec4F32));
+    if (!colorBuffer.pixels) {
+        application-&gt;errorCallback(CG_OUT_OF_MEMORY, "cgCreateColorBufferF32: memory allocation failed");
+    }
+    return colorBuffer;
+}
+
+void cgDestroyColorBufferF32(CgApplication* application,
+                             CgColorBufferF32* buffer)
+{
+    assert(buffer &amp;&amp; "cgDestroyColorBufferF32: buffer is NULL");
+    assert(application &amp;&amp; "cgDestroyColorBufferF32: application is NULL");
+    assert(application-&gt;memoryAllocator &amp;&amp; "cgDestroyColorBufferF32: memoryAllocator is NULL");
+
+    application-&gt;memoryAllocator-&gt;free_mem(buffer-&gt;pixels);
+    buffer-&gt;width = buffer-&gt;height = 0;
+}
+
+void cgGradientColorBufferF32(CgColorBufferF32* colorBuffer,
+                              CgVec4F32 topLeftColor,
+                              CgVec4F32 topRightColor,
+                              CgVec4F32 bottomLeftColor,
+                              CgVec4F32 bottomRightColor)
+{
+    assert(colorBuffer &amp;&amp; "cgGradientColorBufferU32: colorBuffer is NULL");
+
+    for (uint32_t i = 0; i < colorBuffer->width; ++i) {
+        float x = (float)i / (float)colorBuffer-&gt;width;
+        for (uint32_t j = 0; j < colorBuffer->height; ++j) {
+            float y = (float)j / (float)colorBuffer-&gt;height;
+
+            CgVec4F32 topColor = cgLerpVec4F32(topLeftColor, topRightColor, x);
+            CgVec4F32 bottomColor = cgLerpVec4F32(bottomLeftColor, bottomRightColor, x);
+            CgVec4F32 finalColor = cgLerpVec4F32(topColor, bottomColor, y);
+
+            colorBuffer-&gt;pixels[j * colorBuffer-&gt;width + i] = finalColor;
+        }
+    }
+}
+
+CgVec4F32 cgApplyGammaToVec4F32(CgVec4F32 pixel, float gamma)
+{
+    assert(gamma != 0.0f &amp;&amp; "cgApplyGammaToVec4F32: gamma cannot be 0");
+    CgVec4F32 gammaEncodedPixel = {
+        .x = powf(pixel.x, 1.0f / gamma),
+        .y = powf(pixel.y, 1.0f / gamma),
+        .z = powf(pixel.z, 1.0f / gamma),
+        .w = pixel.w
+    };
+    return gammaEncodedPixel;
+}
+
+void cgColorBufferF32ToPPM(CgApplication* application,
+                           const CgColorBufferF32* colorBuffer,
+                           const char* path,
+                           float gamma)
+{
+    assert(colorBuffer &amp;&amp; "cgColorBufferF32ToPPM: colorBuffer is NULL");
+    assert(path &amp;&amp; "cgColorBufferF32ToPPM: path is NULL");
+    assert(application &amp;&amp; "cgColorBufferF32ToPPM: application is NULL");
+    assert(application-&gt;errorCallback &amp;&amp; "cgColorBufferF32ToPPM: error callback is NULL");
+
+    FILE* fp = fopen(path, "w");
+    if (!fp) {
+        application-&gt;errorCallback(CG_FOPEN_FAILURE, "cgColorBufferF32ToPPM: couldn't open file");
+    }
+    fprintf(fp, "P3\n");
+    fprintf(fp, "%u %u\n", colorBuffer-&gt;width, colorBuffer-&gt;height);
+    fprintf(fp, "255\n");
+    uint32_t resolution = colorBuffer-&gt;width * colorBuffer-&gt;height;
+    for (uint32_t i = 0; i &lt; resolution; ++i) {
+        CgVec4F32 pixel = colorBuffer-&gt;pixels[i];
+        CgVec4F32 gammaEncodedPixel = cgApplyGammaToVec4F32(pixel, gamma);
+        uint8_t red = (uint8_t)(gammaEncodedPixel.x * 255.0f);
+        uint8_t green = (uint8_t)(gammaEncodedPixel.y * 255.0f);
+        uint8_t blue = (uint8_t)(gammaEncodedPixel.z * 255.0f);
+        fprintf(fp, "%u %u %u\n", red, green, blue);
+    }
+    fclose(fp);
+}
+
+int main()
+{
+    uint32_t width = 320;
+    uint32_t height = 240;
+    float gamma = 2.2f;
+
+    CgApplication application = {
+        .memoryAllocator = cgGetDefaultAllocator(),
+        .errorCallback = cgDefaultErrorCallback
+    };
+
+    CgColorBufferF32 colorBuffer = cgCreateColorBufferF32(&amp;application, width, height);
+    CgVec4F32 topLeftColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+    CgVec4F32 topRightColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+    CgVec4F32 bottomLeftColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+    CgVec4F32 bottomRightColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+    cgGradientColorBufferF32(&amp;colorBuffer, topLeftColor, topRightColor, bottomLeftColor, bottomRightColor);
+    cgColorBufferF32ToPPM(&amp;application, &amp;colorBuffer, "sample.ppm", gamma);
+    cgDestroyColorBufferF32(&amp;application, &amp;colorBuffer);
+    return 0;
+}
+        </code></pre>
+    </details>
     <p>
-        See the <a href="../code/cursedgl/3.c" target="_blank">source code</a> for changes in other functions.
+        We are now ready to begin rendering actual objects, starting from the simplest one.
     </p>
     </article>
 
