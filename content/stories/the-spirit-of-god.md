@@ -33,8 +33,8 @@ The Transporter's job was to change the orbits of stars, causing them to fall
 toward the galactic core---where the heat from the accretion disk sustained the
 last intelligent beings in the universe. He was among the few other
 fully-automated scavengers tasked with feeding a monster.  It took millions of
-years before the star finally found itself torn apart in the only cosmic
-fireplace left sustaining the dim consciousness of the machine beggars.
+years before the star was finally torn apart in the only cosmic fireplace left
+sustaining the dim consciousness of the machine beggars.
 
 While following the protocol---as he did countless times for countless
 stars---the Transporter was interrupted by another signal. This event, though
@@ -91,5 +91,5 @@ movement, hear so many sounds, feel so much warmth, and experience so many
 sensations. Even the rugged geometry of the barren landmass gripped him,
 embracing him.
 
-The Transporter sat on a wet rock, and watched the Spirit of God brood upon the
-primordial waters.
+Overwhelmed, the Transporter sat on a wet rock, and watched the Spirit of God
+brood upon the primordial waters.
