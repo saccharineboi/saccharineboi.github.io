@@ -70,7 +70,7 @@ was found---until one day.
 
 ---
 
-A signal awoke the Transporter. A message from one of the compute modules raised
+The signal awoke the Transporter. A message from one of the compute modules raised
 an interrupt in the spaceship's central processor. A single sixteen-byte key was
 found to correctly decrypt the output to a low-entropy plaintext. Alas, the ship
 had exhausted its antimatter reserves. The protocol was kaput. And yet, seemingly
