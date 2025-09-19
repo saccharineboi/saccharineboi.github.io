@@ -1,0 +1,392 @@
+baseURL = 'https://e954.dev/'
+languageCode = 'en-us'
+title = '/home/e954'
+theme = 'typo'
+
+[taxonomies]
+tag = 'tags'
+
+[params]
+homeIntroTitle = './about-me'
+homeIntroContent = '''
+I am a software engineer interested in graphics programming, game engine
+development, low-level programming, applied cryptography, and machine learning.
+I can program in C, C++, Lua, Typescript, Slang (shading language), GLSL (also
+a shading language), and a little bit in Python, Haskell, and Rust, too.
+For graphics programming I use Vulkan, but I have also written my own
+[rasterizer](https://github.com/saccharineboi/CursedGL) and
+[ray-tracer](https://github.com/saccharineboi/CursedRay).  I like tinkering
+with embedded electronics (I have raspberry pi 2 zero w and a couple of pico
+microcontrollers).  [Free software](https://www.fsf.org/) and [free
+speech](https://www.eff.org/issues/free-speech) advocate.
+[Linux](https://archlinux.org) user.  Technolibertarian and transhumanist.
+[Cypherpunk](https://cdn.nakamotoinstitute.org/docs/cypherpunk-manifesto.txt).
+[Crypto-Anarchist](https://groups.csail.mit.edu/mac/classes/6.805/articles/crypto/cypherpunks/may-crypto-manifesto.html).
+[Aaron Swartz](https://en.wikipedia.org/wiki/Aaron_Swartz) saved the Internet.
+Fossil fuels are bad, nuclear energy is good (including fission).  All nuclear
+weapons must be eliminated and the use/manufacture/storage of all nuclear
+weapons must be [banned](https://www.icanw.org/) unconditionally.  I am against
+[software patents](https://endsoftwarepatents.org/).  [Open
+source](https://opensource.org/) FTW.
+[OOP](https://gameprogrammingpatterns.com/contents.html) is overrated, learn
+[DOD](https://www.dataorienteddesign.com/dodbook.pdf) instead.  I use
+[vim](https://www.vim.org/) for editing text.  I can speak English and Turkish,
+and I'm learning German and French.  I am in the [graphics
+programming](https://discord.gg/graphicsprogramming) and
+[fhe](https://discord.gg/fhe-org) discord channels.
+[Grug](https://grugbrain.dev/) is smart. [RMS](https://stallman.org/) is right.
+Support [EFF](https://www.eff.org/) and [FSF](https://www.fsf.org/).  Remember
+to [look up](https://www.jpl.nasa.gov/asteroid-watch/eyes-on-asteroids).
+Aliens are probably out there, and they are [coming toward
+us](https://grabbyaliens.com/).  The universe belongs to the
+[machines](https://doi.org/10.1016/j.actaastro.2008.01.025).  We are likely
+[the only intelligent
+beings](https://en.wikipedia.org/wiki/Rare_Earth:_Why_Complex_Life_Is_Uncommon_in_the_Universe)
+in our galaxy.  The future is
+[wild](https://www.cold-takes.com/all-possible-views-about-humanitys-future-are-wild/).
+
+## ./graphics-programming-resources
+There are many good resources that teach graphics programming, and I have
+shared some of them here. If you see a dead link, then contact me.
+[Scratchapixel](https://www.scratchapixel.com/index.html) is a good place to
+start.  If you want to learn game engine programming, then check out
+[engine-programming](https://engine-programming.github.io/) and [Game Engine
+Architecture](https://www.gameenginebook.com/).  For learning OpenGL, see
+[learnopengl](https://learnopengl.com/),
+[open.gl](https://open.gl/), [OpenGL 4.0+](https://antongerdelan.net/opengl/),
+and [ogldev](https://ogldev.org/).  There are
+[modern](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions) OpenGL
+functions that you should know about.  [songho](https://songho.ca/) has useful
+articles, even though some of them have become outdated.
+[ogldev](https://ogldev.org/) has a [youtube
+channel](https://www.youtube.com/@OGLDEV).
+[Nvidia](https://developer.nvidia.com/gpugems/) has good resources for learning
+shader programming. They have also helped develop a great [shading
+language](https://shader-slang.com/) that I use.  [AMD](https://gpuopen.com/)
+has a dedicated website for graphics and game engine programmers that you may
+find useful.  ARM has
+[manga](https://interactive.arm.com/story/the-arm-manga-guide-to-the-mali-gpu/page/1).
+Take a
+[trip](https://fgiesen.wordpress.com/2011/07/09/a-trip-through-the-graphics-pipeline-2011-index/)
+(no acid required) through the graphics pipeline.  Watch [Cem Yuksel's
+lectures](https://www.youtube.com/@cem_yuksel) to learn computer graphics.
+Learn [tone mapping](https://64.github.io/tonemapping/). Learn
+[PBR](https://google.github.io/filament/Filament.html).  Learn
+[FXAA](http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html).
+Learn
+[TAA](https://ziyadbarakat.wordpress.com/2020/07/28/temporal-anti-aliasing-step-by-step/).
+Learn [gamma
+correction](https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/).
+Learn [ray
+tracing](https://raytracing.github.io/books/RayTracingInOneWeekend.html).  If
+you want to learn Vulkan, then there is
+[vulkan-tutorial](https://vulkan-tutorial.com/) and
+[vkguide](https://vkguide.dev/).  Vulkan is a lot more verbose than OpenGL
+though, and if you're not CPU-bound or don't need modern features like
+ray-tracing then you should stick to OpenGL.  You can also run Vulkan on Apple
+devices using [moltenvk](https://moltengl.com/moltenvk/).  For learning C++, I
+recommend [learncpp](https://www.learncpp.com/). There are cheatsheets at
+[hackingcpp](https://hackingcpp.com/).  If you care about efficiency then read
+[this book](https://a.co/d/4ltIK0Y).  In addition to debugging with
+[GDB](https://www.gnu.org/software/gdb/) ([RAD
+Debugger](https://github.com/EpicGamesExt/raddebugger) is much better, but is
+available only on 64-bit Windows), you should also learn to profile your
+graphics applications, which is why you need
+[tracy](https://github.com/wolfpld/tracy).  Another useful application for
+debugging your graphics applications is [renderdoc](https://renderdoc.org/).
+If you want to learn [WebGL](https://a.co/d/55wpDHt), then you should know some
+[javascript](https://books.danielhofstetter.com/javascript-the-good-parts/)
+first.  [WebGPU](https://shi-yan.github.io/webgpuunleashed) is a more modern
+API for 3D graphics on the Web.  Learn some [math](https://gamemath.com/) for
+game programming.  For scripting, use [Lua](https://www.lua.org/).  For general
+computer science stuff check out Oxford's
+[website](https://mathcenter.oxford.emory.edu/site/home/).  Another good
+resource is [the pragmatic bookshelf](https://pragprog.com/).  [Cracking the
+coding interview](https://a.co/d/j0uJTfy) is a good book regardless of whether
+you're trying to get hired or not.  You can always [teach yourself
+CS](https://teachyourselfcs.com/).  Another good list of computer science books
+is [this](https://jorenar.com/blog/cs-books).  More graphics programming
+resources can be found at
+[realtimerendering.com](https://www.realtimerendering.com/).  For algorithms
+[this](https://en.algorithmica.org/hpc/) book is really good.  For software
+design, check out John Ousterhout's [Philosophy of Software
+Design](https://web.stanford.edu/~ouster/cgi-bin/book.php).  If you're in a
+retro mood, then check out [8bitworkshop](https://8bitworkshop.com/).
+Unfortunately I cannot list *all* resources here, but the sites that I have
+linked often have more links to other areas of graphics programming.  Do check
+out the [graphics programming discord](https://discord.gg/graphicsprogramming)
+and the [graphics programming
+subreddit](https://www.reddit.com/r/GraphicsProgramming/).
+
+## ./cryptography-resources
+For a well-tested cryptography library check out
+[libsodium](https://doc.libsodium.org/).  For post-quantum cryptography library
+check out the [OQS project](https://github.com/open-quantum-safe).  If you want
+to learn FHE, then go to [fhe.org](https://fhe.org/resources/).  For
+standardization efforts see
+[homomorphicencryption.org](https://homomorphicencryption.org/).  If you want
+to make something with FHE then you may use [OpenFHE](https://www.openfhe.org/)
+or one of [Zama's](https://zama.ai) libraries.  [Jeremy
+Kun](https://www.jeremykun.com/) has great articles on FHE.  If you're into
+cryptocurrency, then check out [Monero](https://www.getmonero.org/).
+[Stanford](https://crypto.stanford.edu/~dabo/courses/OnlineCrypto/) has a good
+cryptography course.  Stanford's website also hosts Dr Gentry's
+[thesis](https://crypto.stanford.edu/craig/craig-thesis.pdf) and his
+[introductory essay](https://crypto.stanford.edu/craig/easy-fhe.pdf) to the
+world of FHE.  Christof Paar has posted his
+[lectures](https://www.youtube.com/playlist?list=PL2jrku-ebl3H50FiEPr4erSJiJHURM9BX)
+on cryptography for free on youtube.  Buy [his
+book](https://www.cryptography-textbook.com/) too.  [Serious
+Cryptography](https://nostarch.com/serious-cryptography-2nd-edition) by
+[Jean-Philippe Aumasson](https://www.aumasson.jp/) is also a great book.  If
+you want to protect your privacy then check out
+[privacytools.io](https://www.privacytools.io/).  You may experiment with
+different cryptographic primitives using [BouncyCastle's
+APIs](https://www.bouncycastle.org/about/).  Also visit
+[cr.yp.to](https://cr.yp.to/).  [Soatok](https://soatok.blog/?s=crypto) has
+nice articles on cryptography and related shenanigans.
+
+## ./ai-resources
+To learn AI you should start by [making your own neural
+network](https://a.co/d/0dHmZUP).  One does not bet against [deep
+learning](https://www.youtube.com/watch?v=BjyZcSiVg5A). Instead, try to
+["understand"](_blank) it.  You can also learn machine learning in mere [100
+pages](https://a.co/d/4MQcIKZ).  Some [math](https://a.co/d/7Oi6ZrV) would be
+useful (mostly linear algebra/calculus/statistics).  I believe that we are very
+close to [AGI](https://generative.ink/posts/simulators/) and it will [change
+everything](https://youtu.be/3K25VPdbAjU?si=7NSLfCb6YpSQOoHO). [ChatGPT Is Not
+a Blurry JPEG of the Web. It's a
+Simulacrum.](https://blog.domenic.me/chatgpt-simulacrum/) Here is an essential
+[guide](https://aisafety.info/) to AI safety.  [Rob
+Miles](https://www.youtube.com/@RobertMilesAI) has a nice youtube channel where
+he explains AI safety very well.  We need to work on [AI
+alignment](https://aisafetyfundamentals.com/blog/alignment-introduction/).  No,
+I am not an AI doomer, and I don't think that asking for safety in AI systems
+amounts to doomerism.
+
+## ./general-literacy
+A lot of the resources that I have listed assume that you're proficient in high
+school math. If not, then read [this book](https://a.co/d/0qrdAgc) by George F.
+Simmons.  For a good list of math books visit
+[mathblog.com](https://mathblog.com/mathematics-books/).  For a good list of
+humanities books visit [Dr Peterson's
+website](https://www.jordanbpeterson.com/books/), which also has a great [essay
+writing
+guide](https://jordanbpeterson.com/wp-content/uploads/2018/02/Essay_Writing_Guide.docx).
+Here's a little tip from me: combine Jordan Peterson's essay writing guide with
+Larry McEnerney's ["The craft of writing effectively"](_blank)&mdash;you will
+become a force of nature.  Check out the [4chan reading
+list](https://lit.trainroll.xyz/wiki/Recommended_Reading/sub).  You may start
+your reading journey with [this
+list](https://lit.trainroll.xyz/images/e/e2/1365475090228.jpg) of books.
+
+## ./general-advice
+Don't overcomplicate things.  [An idiot admires complexity, a genius admires
+simplicity](https://youtu.be/k0qmkQGqpM8?si=VmkUdxl2cNHORd5d).  Sometimes, [all
+you need is a function](https://x.com/ID_AA_Carmack/status/53512300451201024).
+Strive for [perfection](https://www.azquotes.com/quote/687314).  Be
+[succinct](https://www.socratic-method.com/quote-meanings/blaise-pascal-i-have-made-this-letter-longer-than-usual-only-because-i-have-not-had-the-time-to-make-it-shorter).
+[Worse is better](https://www.dreamsongs.com/WorseIsBetter.html).  Don't be
+afraid to reinvent the wheel. Don't be afraid to make mistakes. That's how you
+learn.  Think outside the box. Just because something has been invented to do a
+particular thing, doesn't mean it can't be used to do other things.  Learn to
+accept criticism, but also understand that recognizing good critique requires
+time and experience.  If you think you are smart enough to be sure that
+something is true, then know that it takes just as much intellect to recognize
+when a claim is false.  Most elegant truths are those that are simple and
+replicable. So make sure that others can validate your claims without your
+help.  Bonus points if your claims can be validated by those who hold biases
+against you.  If you are even slightly creative, then you will be
+misunderstood. There is no way around this, you will have to learn to live with
+it.  Try to [be logical](https://yourlogicalfallacyis.com/), except when you're
+being creative, then all is fair.  But know that illogical claims cannot demand
+logical judgement, and that's *only* fair.
+
+## ./cartoons
+I watch *a lot of* cartoons. [Adventure
+Time](https://en.wikipedia.org/wiki/Adventure_Time), [Owl
+House](https://en.wikipedia.org/wiki/The_Owl_House),
+[ATLA](https://en.wikipedia.org/wiki/Avatar:_The_Last_Airbender),
+[TLOK](https://en.wikipedia.org/wiki/The_Legend_of_Korra), [The Dragon
+Prince](https://en.wikipedia.org/wiki/The_Dragon_Prince), [Rick and
+Morty](https://en.wikipedia.org/wiki/Rick_and_Morty), [Gravity
+Falls](https://en.wikipedia.org/wiki/Gravity_Falls),
+[Amphibia](https://en.wikipedia.org/wiki/Amphibia_(TV_series)), [She-Ra and the
+Princesses of
+Power](https://en.wikipedia.org/wiki/She-Ra_and_the_Princesses_of_Power),
+[Courage the Cowardly
+Dog](https://en.wikipedia.org/wiki/Courage_the_Cowardly_Dog), [SpongeBob
+Squarepants](https://en.wikipedia.org/wiki/SpongeBob_SquarePants), [Shaun the
+Sheep](https://en.wikipedia.org/wiki/Shaun_the_Sheep), [Cowboy
+Bebop](https://en.wikipedia.org/wiki/Cowboy_Bebop), [The Amazing World of
+Gumball](https://en.wikipedia.org/wiki/The_Amazing_World_of_Gumball), [Samurai
+Jack](https://en.wikipedia.org/wiki/Samurai_Jack), [Foster's Home for Imaginary
+Friends](https://en.wikipedia.org/wiki/Foster%27s_Home_for_Imaginary_Friends),
+[Ben 10](https://en.wikipedia.org/wiki/Ben_10_(2005_TV_series)), [Steven
+Universe](https://en.wikipedia.org/wiki/Steven_Universe), [Teen
+Titans](https://en.wikipedia.org/wiki/Teen_Titans_(TV_series)), [Scooby-Doo!
+Mystery
+Incorporated](https://en.wikipedia.org/wiki/Scooby-Doo!_Mystery_Incorporated),
+[Futurama](https://en.wikipedia.org/wiki/Futurama), [Kim
+Possible](https://en.wikipedia.org/wiki/Kim_Possible), [American Dragon: Jake
+Long](https://en.wikipedia.org/wiki/American_Dragon:_Jake_Long), [Phineas and
+Ferb](https://en.wikipedia.org/wiki/Phineas_and_Ferb), and [Star vs. the Forces
+of Evil](https://en.wikipedia.org/wiki/Star_vs._the_Forces_of_Evil) are my
+favorites. I wish I could watch more, but there isn't enough time.
+
+I don't watch many TV series, but [Mr.
+Robot](https://en.wikipedia.org/wiki/Mr._Robot) and
+[Chernobyl](https://en.wikipedia.org/wiki/Chernobyl_(miniseries)) are pretty
+good.
+
+## ./games
+I mostly play [Stardew
+Valley](https://store.steampowered.com/app/413150/Stardew_Valley/) and
+[Factorio](https://store.steampowered.com/app/427520/Factorio/).
+
+## ./diabetes-advice
+I have type 1 diabetes, so this advice may not be applicable to other types.
+There are really only two ways of dealing with this disease: you can either eat
+whatever you want and not care too much about high blood sugars, or you can
+adhere to a strict keto diet and enjoy the stability that comes with it.  The
+truth is, your blood sugars will go wild the moment you eat something high in
+carbs (sometimes even low carb foods will throw it out of the loop).  Other
+times your body will simply say "fuck you" and do whatever it wants. It
+happens. No, it's not your fault. Many diabetics experience this---I also
+experience this.
+
+1. If you aren't on a pump, then use something *very* long-range for your basal (e.g.
+[Tresiba](https://www.drugs.com/tresiba.html)).
+2. Don't use Levemir.
+3. Exercise. No need to be an athlete, something as simple as walking helps a
+lot.
+4. Try to have a schedule. Personally this is very hard for me as I'm
+more of a spontaneous type of guy, but it helps tremendously.
+5. Get yourself
+a CGM. It will help you learn which kinds of food affect your blood sugar the
+most.
+6. Always tell people that you're a diabetic. Whether it's a date, or a
+professional meeting, or just a hang-out, it doesn't matter. There's always a
+chance that you may pass out from hypoglycemia, and it's important that someone
+knows you're diabetic and relays that to the paramedics. If you don't want to
+tell people, then at least wear a
+[wristband](https://shop.diabetes.org.uk/collections/wristbands-1).
+7. **DO NOT** listen to what those old type 2 diabetic hags say.  Often they are in
+denial of their disease and don't take care of themselves to begin with. Most
+of the time their advice doesn't apply to type 1 diabetics anyway, and usually
+it is based on either pseudoscience or gross misunderstanding of the scientific
+literature.
+8. **DO NOT** listen to people who claim to know what's best for
+you just because they have a friend/relative/child with diabetes. I can assure
+you, they know almost nothing. They have a bad case of
+[Dunning-Kruger](https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect),
+and their advice is often terrible.
+9. Have quarterly visits to an
+endocrinologist. It may be hard to find a good one, but it's worth it.
+10.  Read the [Type 1 Diabetes Self-Care
+Manual](https://diabetes.org/living-with-diabetes/type-1/type-1-self-care-manual)
+from [ADA](https://diabetes.org/).
+11. Get vaccinated.
+12. Do not smoke.
+13.  Do not drink alcohol. Or at least eat something before/after to prevent
+hypoglycemia.
+14. Don't be a pessimist. Remember, insulin was only discovered
+in the last century, and for most of human history type 1 diabetes was a fatal
+disease.You are very lucky to be born in the modern age.  There are
+[signs](https://www.fda.gov/news-events/press-announcements/fda-approves-first-cellular-therapy-treat-patients-type-1-diabetes)
+that we will be able to cure it soon.
+
+There are a lot of charlatans out there who will claim that they can cure your
+diabetes---**DO NOT** listen to them. It's all bullshit. A *real*
+cure will be announced by organizations like the [ADA](https://diabetes.org/).
+
+If you are angry at big pharma profiting from diabetics, like I am, then visit
+[openinsulin.org](https://openinsulin.org/).
+
+## ./contact-me
+
+saccharineboi@gmail.com:
+
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+    mDMEZ0BXpRYJKwYBBAHaRw8BAQdAPXJMSA1N1C8mXWz9Yz9RC2CFMbQmoxTgKV0y
+    bjjMyp20J09tYXIgSHVzZXlub3YgPHNhY2NoYXJpbmVib2lAZ21haWwuY29tPoiZ
+    BBMWCgBBFiEET4bgHhQUmf9tqSqZjBcGpMYjvZcFAmdAV6UCGwMFCQlmAYAFCwkI
+    BwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQjBcGpMYjvZf+iAEA8ig7TijKbbDJ
+    98LO9H+jlNrwY9nFSXnFg5mlU9DkOFQA/j019UtZ/c1u6ldR+0PIlGTcKiN2nKea
+    3NoCKhMPpSAAuDgEZ0BXpRIKKwYBBAGXVQEFAQEHQIuCW+IXSrqgmcTlm58b9GjG
+    U+HhiYG75wGCxGPRCxAKAwEIB4h+BBgWCgAmFiEET4bgHhQUmf9tqSqZjBcGpMYj
+    vZcFAmdAV6UCGwwFCQlmAYAACgkQjBcGpMYjvZcbvQEAjnwQ1KsC6ALBlGa6LwR/
+    GIQKWjEWbOAn/xCY2O2Z4wsA/2gJrVI3V5Y91wKtnHys68QlxGjfk0uNLiKKm4lX
+    6iQN
+    =PLle
+    -----END PGP PUBLIC KEY BLOCK-----
+
+omar_huseynov@outlook.com:
+
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+    mDMEZz+Z0RYJKwYBBAHaRw8BAQdAtWE3ZH4Dm2evdx5QNgC1CYQ4uoSMJK6LlJfc
+    xXFlsgS0KU9tYXIgSHVzZXlub3YgPG9tYXJfaHVzZXlub3ZAb3V0bG9vay5jb20+
+    iJkEExYKAEEWIQTaSukHwkfoIZQDiRMsHvScrkFkrwUCZz+Z0QIbAwUJCWYBgAUL
+    CQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgAAKCRAsHvScrkFkr0GrAQDyaSjWkYhF
+    fzVCG6XMvXxZWumKWyTKlGszzEdDayuIFQEAwwNfLsBQSCFT6iibgr0dM59umLGl
+    xWn6th/6YChmIwy4OARnP5nREgorBgEEAZdVAQUBAQdA0nosV749Cl5E+smxw/HY
+    UsLpTjVB57gjJgC/xvq1EDUDAQgHiH4EGBYKACYWIQTaSukHwkfoIZQDiRMsHvSc
+    rkFkrwUCZz+Z0QIbDAUJCWYBgAAKCRAsHvScrkFkr65eAQDNKvXpmahNay4Fw4qf
+    lYjfOf9b4B8u+lJuskjl60/MRAD/UTik8r/Ogjx5ub6CIUec91aM7h60Gr03UTXT
+    WsTqNAE=
+    =ByRj
+    -----END PGP PUBLIC KEY BLOCK-----
+'''
+
+description = 'Everything is computer'
+
+theme = 'auto'
+colorPalette = 'eink'
+hideHeader = true
+
+paginationSize = 10
+listSummaries = true
+
+showFooter = true
+footerContent = '''
+Published under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+'''
+
+[params.breadcrumbs]
+enabled = true
+showCurrentPage = true
+home = '~'
+
+[[params.social]]
+name = 'github'
+url = 'https://www.github.com/saccharineboi'
+
+[[params.social]]
+name = 'reddit'
+url = 'https://www.reddit.com/user/saccharineboi'
+
+[[params.social]]
+name = 'x'
+url = 'https://x.com/saccharineboi'
+
+[[params.social]]
+name = 'linkedin'
+url = 'https://www.linkedin.com/in/omar-huseynov/'
+
+[[params.menu]]
+name = 'stories'
+url = '/stories'
+
+[[params.menu]]
+name = 'tags'
+url = '/tags'
+
+[markup]
+[markup.highlight]
+style = 'algol'
+
+[module]
+[[module.imports]]
+path = 'github.com/tomfran/typo'
