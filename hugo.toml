@@ -376,6 +376,10 @@ name = 'linkedin'
 url = 'https://www.linkedin.com/in/omar-huseynov/'
 
 [[params.menu]]
+name = 'articles'
+url = '/articles'
+
+[[params.menu]]
 name = 'stories'
 url = '/stories'
 
