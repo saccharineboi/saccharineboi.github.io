@@ -7,6 +7,7 @@ theme = 'typo'
 tag = 'tags'
 
 [params]
+faviconPath = '/favicon'
 homeIntroTitle = './about-me'
 homeIntroContent = '''
 I am a software engineer interested in graphics programming, game engine
